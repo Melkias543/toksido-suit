@@ -1,5 +1,5 @@
 "use client";
-import suits from "../public/Images/suits.js";
+import suits from "./data/suits.js";
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { Canvas } from "@react-three/fiber";
@@ -104,11 +104,11 @@ const LandingPage = () => {
 
         {/* HERO CONTENT */}
         <div className="relative z-10 text-center px-6 pointer-events-none">
-          <div className="pointer-events-auto">
-            <h1 className="text-[50px] sm:text-7xl md:text-[150px] font-serif font-light text-white leading-[0.9] tracking-tighter">
-              Elite <br />
+          <div className="pointer-events-auto text-yellow-600">
+            <h1 className="text-[50px] sm:text-7xl md:text-[150px] font-serif font-light text-white leading-[0.9] tracking-tighter text-yellow-600">
+              TOKSIDO <br />
               <span className="font-bold italic text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-500">
-                Standards
+                Standards Suit
               </span>
             </h1>
             <p className="text-gray-400 text-[10px] md:text-lg mt-6 mb-10 max-w-[250px] md:max-w-lg mx-auto font-light tracking-[0.2em] uppercase">

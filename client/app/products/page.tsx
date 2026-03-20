@@ -1,9 +1,6 @@
 "use client";
-import suits from "../../public/Images/suits.js";
-import React from "react";
+import suits from "../data/suits.js";
 import Image from "next/image";
-import { Canvas } from "@react-three/fiber";
-import { Float, OrbitControls, Html } from "@react-three/drei";
 import Link from "next/link.js";
 
 const LandingPage = () => {
@@ -60,11 +57,11 @@ const LandingPage = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
           {suits.map((suit) => (
-            <Link href={`/product/${suit.id}`}>
-              <div
-                key={suit.id}
-                className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden group hover:shadow-2xl transition-all duration-500 border border-transparent hover:border-yellow-400/20"
-              >
+            <div
+              key={suit.id}
+              className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden group hover:shadow-2xl transition-all duration-500 border border-transparent hover:border-yellow-400/20"
+            >
+              <Link href={`/product/${suit.id}`}>
                 <div className="relative w-full h-[400px] overflow-hidden">
                   <Image
                     src={suit.image}
@@ -97,8 +94,8 @@ const LandingPage = () => {
                     </button>
                   </div>
                 </div>
-              </div>
-            </Link>
+              </Link>
+            </div>
           ))}
         </div>
       </section>
