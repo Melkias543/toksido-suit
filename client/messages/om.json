@@ -1,0 +1,31 @@
+{
+  "LandingHeropage": {
+    "heroTitle": "Fiixummaa Eebbifamaa",
+    "heroSubtitle": "Aartii ijaarsaa kan uffatamu.",
+    "exploreBtn": "WALITTI QABAADHA FILADHA",
+    "suits": {
+      "classic": "Gurraacha Noormaalii",
+      "navy": "Buluuta Naavii",
+      "tuxedo": "Tuksiidoo Galgalaa"
+    }
+  },
+  
+  "Services": {
+    "sectionTitle": "Tajajila Nuti Kenninu.",
+    "service1Title": "Hojii uffata dhuunfaa",
+    "service2Title": "Paakeejii Cidhaa",
+    "service3Title": "Uffata Qophaa'e",
+    "service1Desc": "Akaakuu fi bocawwan uffataa adda ta’an kan harka qulqulluun hojjetaman.",
+    "service2Desc": "Miidhagina groomii fi garee cidhaa maraaf walitti qindaa’e.",
+    "service3Desc": "Filannoowwan uffata qophaa'oo qulqullina olaanaa qaban.",
+    "learnMore": "Dabalatan Dubbisuf"
+  },
+  "Footer": {
+    "description": "Bara 2026 jalqabee uffata dhiiraa qulqullina, hambaafi diizaayinii amayyaatiin ibsaa jirra. Odeeffannoo dabalataaf nuyitti makamaa.",
+    "contactHeader": "Quunnamtii",
+    "location": "Finfinnee, Itoophiyaa",
+    "socialHeader": "Miidiyaa Hawaasaa",
+    "copyright": "© 2026 TOKSIDO SUITS. QULQULLINA OLAANAAN KAN HOJJETAME."
+  }
+
+}
