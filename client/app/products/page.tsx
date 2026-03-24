@@ -1,5 +1,5 @@
 "use client";
-import suits from "../data/suits.js";
+import suits from "../../src/data/suits.js";
 import Image from "next/image";
 import Link from "next/link.js";
 
