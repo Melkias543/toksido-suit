@@ -22,7 +22,20 @@ function HeroPage({ params: lll }: Props) {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-
+useEffect(() => {
+  // Silence the THREE.Clock deprecation warning
+  const originalWarn = console.warn;
+  console.warn = (...args) => {
+    if (
+      args[0] &&
+      typeof args[0] === "string" &&
+      args[0].includes("THREE.Clock")
+    ) {
+      return;
+    }
+    originalWarn(...args);
+  };
+}, []);
   // Timer for mobile background rotation (20 seconds)
   useEffect(() => {
     if (isMobile) {
@@ -51,7 +64,8 @@ function HeroPage({ params: lll }: Props) {
                   alt={suit.title}
                   fill
                   className="object-cover"
-                  priority
+                  priority={index === 0} // Only priority for the first image
+                  sizes="100vw"
                 />
               </div>
             ))}
@@ -108,6 +122,7 @@ function HeroPage({ params: lll }: Props) {
                             fill
                             className="object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700"
                             loading="eager"
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-80" />
                           <div className="absolute bottom-10 left-10">
