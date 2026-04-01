@@ -49,7 +49,7 @@ const LandingPage = () => {
       <section className="py-12 px-6 md:px-16 max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-12">
           <h2 className="text-3xl font-bold">Featured Suits</h2>
-          <div className="hidden md:block h-[1px] bg-gray-200 dark:bg-gray-800 flex-grow mx-8"></div>
+          <div className="hidden md:block px bg-gray-200 dark:bg-gray-800 flex-grow mx-8"></div>
           <button className="text-sm font-bold text-yellow-500 uppercase tracking-widest hover:underline">
             View All
           </button>
@@ -62,12 +62,13 @@ const LandingPage = () => {
               className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden group hover:shadow-2xl transition-all duration-500 border border-transparent hover:border-yellow-400/20"
             >
               <Link href={`/product/${suit.id}`}>
-                <div className="relative w-full h-[400px] overflow-hidden">
+                <div className="relative w-full h-100 overflow-hidden">
                   <Image
                     src={suit.image}
                     alt={suit.title}
                     fill
                     className="object-cover transition-transform duration-1000 group-hover:scale-110"
+                    priority
                   />
                   {/* Subtle dark overlay on bottom of image for legibility */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />

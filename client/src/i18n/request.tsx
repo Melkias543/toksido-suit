@@ -1,17 +1,17 @@
 import { getRequestConfig } from "next-intl/server";
+import { cookies } from "next/headers";
 import { routing } from "./routing";
 
-export default getRequestConfig(async ({ requestLocale }) => {
-  let locale = await requestLocale;
+export default getRequestConfig(async () => {
+  const cookieStore = await cookies();
+  const locale = cookieStore.get("NEXT_LOCALE")?.value || routing.defaultLocale;
 
-  // Fallback if no locale is detected
-  if (!locale || !routing.locales.includes(locale as any)) {
-    locale = routing.defaultLocale;
-  }
+  const validLocale = routing.locales.includes(locale as any)
+    ? locale
+    : routing.defaultLocale;
 
   return {
-    locale,
-    // Use the explicit switch to avoid the Turbopack "Module not found" error
-    messages: (await import(`../../messages/${locale}.json`)).default,
+    locale: validLocale,
+    messages: (await import(`../../messages/${validLocale}.json`)).default,
   };
 });
