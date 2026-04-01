@@ -1,9 +1,13 @@
 import React from 'react'
+import { div } from 'three/tsl';
 
-function Contact() {
+function SpecialContact() {
   return (
-    <div>Contact</div>
-  )
+  <div>
+
+    contafklnfksn
+  </div>
+  );
 }
 
-export default Contact
+export default SpecialContact

@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 // Adjusted import path for suits data
-import suits from "../../data/suits.js";
+import suits from "../../../src/data/suits.js";
 
 const ProductDetail = () => {
   const { id } = useParams();

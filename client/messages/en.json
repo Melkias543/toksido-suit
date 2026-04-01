@@ -1,0 +1,31 @@
+{
+  "LandingHeropage": {
+    "heroTitle": "Bespoke Perfection",
+    "heroSubtitle": "Architecture you can wear.",
+    "exploreBtn": "EXPLORE COLLECTION",
+    "suits": {
+      "classic": "Classic Black",
+      "navy": "Navy Blue Slim",
+      "tuxedo": "Evening Tuxedo"
+    }
+  },
+ "Services": {
+    "sectionTitle": "Our Services",
+    "sectionSubtitle": "From wedding galas to corporate boardrooms, we ensure your presence is felt before you speak a word.",
+    "learnMore": "Learn More",
+    "service1Title": "Bespoke Tailoring",
+    "service1Desc": "Hand-stitched perfection measured to your unique silhouette.",
+    "service2Title": "Wedding Packages",
+    "service2Desc": "Coordinated elegance for the groom and the entire wedding party.",
+    "service3Title": "Ready-to-Wear",
+    "service3Desc": "Premium off-the-rack selections for the modern professional."
+  },
+  "Footer": {
+    "description": "Defining menswear through precision, heritage, and contemporary design since 2026. Join our newsletter for exclusive trunk show access.",
+    "contactHeader": "Contact",
+    "location": "Addis Ababa, Ethiopia",
+    "socialHeader": "Social",
+    "copyright": "© 2026 TOKSIDO SUITS. CRAFTED FOR EXCELLENCE."
+  }
+
+}
