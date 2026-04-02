@@ -21,4 +21,5 @@ const userSchema = new mongo.Schema({
   phone: String
 }, { timestamps: true })
 
+userSchema.index({ email: 1 }, { unique: true })
 export const User = mongo.model('User', userSchema)
