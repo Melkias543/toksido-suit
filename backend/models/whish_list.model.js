@@ -10,5 +10,6 @@ const wishlistSchema = new mongo.Schema({
     ref: 'Product'
   }
 }, { timestamps: true })
+wishlistSchema.index({ user_id: 1, product_id: 1 }, { unique: true })
 
 export const Wishlist = mongo.model('Wishlist', wishlistSchema)
