@@ -14,7 +14,12 @@ import {
   ArrowUpRight,
 } from "lucide-react";
 
-const CentralDashboard = ({ isDark, setIsDark }) => {
+type Props = {
+  isDark: boolean;
+  setIsDark: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+const CentralDashboard = ({ isDark, setIsDark }: Props) => {
   return (
     <div className="flex-1 w-full bg-gray-50 dark:bg-gray-950 p-4 md:p-8 overflow-y-auto transition-colors duration-300">
       {/* --- TOP HEADER --- */}
@@ -30,7 +35,6 @@ const CentralDashboard = ({ isDark, setIsDark }) => {
         </div>
 
         <div className="flex items-center gap-3">
-          {/* Theme Toggle */}
           <button
             onClick={() => setIsDark(!isDark)}
             className="flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 hover:text-blue-600 transition-all shadow-sm"
@@ -38,7 +42,6 @@ const CentralDashboard = ({ isDark, setIsDark }) => {
             {isDark ? <Sun size={18} /> : <Moon size={18} />}
           </button>
 
-          {/* Notifications */}
           <button className="relative h-10 w-10 flex items-center justify-center rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-400">
             <Bell size={18} />
             <span className="absolute top-2.5 right-2.5 h-2 w-2 bg-red-500 rounded-full border-2 border-white dark:border-gray-900"></span>
@@ -46,7 +49,6 @@ const CentralDashboard = ({ isDark, setIsDark }) => {
 
           <div className="h-10 w-px bg-gray-200 dark:bg-gray-800 mx-1 hidden md:block"></div>
 
-          {/* Profile Quick Link */}
           <button className="flex items-center gap-2 pl-2 pr-1 py-1 rounded-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-sm">
             <span className="text-xs font-bold text-gray-700 dark:text-gray-300 ml-2 hidden sm:block">
               Admin
@@ -92,7 +94,6 @@ const CentralDashboard = ({ isDark, setIsDark }) => {
 
       {/* --- MAIN CONTENT AREA --- */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left: Activity Feed */}
         <div className="lg:col-span-2 space-y-8">
           <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 p-6 shadow-sm">
             <div className="flex items-center justify-between mb-6">
@@ -137,7 +138,6 @@ const CentralDashboard = ({ isDark, setIsDark }) => {
           </div>
         </div>
 
-        {/* Right: Insights & Progress */}
         <div className="space-y-6">
           <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 p-6 shadow-sm">
             <h3 className="text-lg font-black text-gray-900 dark:text-gray-100 mb-6">
@@ -179,9 +179,16 @@ const CentralDashboard = ({ isDark, setIsDark }) => {
   );
 };
 
-// --- SMALL UI HELPERS ---
+// --- TYPES IMPROVED ONLY ---
+type StatCardProps = {
+  title: string;
+  value: string;
+  trend: string;
+  Icon: React.ComponentType<{ size?: number }>;
+  color: "blue" | "emerald" | "purple" | "orange";
+};
 
-const StatCard = ({ title, value, trend, Icon, color }) => {
+const StatCard = ({ title, value, trend, Icon, color }: StatCardProps) => {
   const colorMap = {
     blue: "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20",
     emerald:
@@ -190,7 +197,7 @@ const StatCard = ({ title, value, trend, Icon, color }) => {
       "text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/20",
     orange:
       "text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/20",
-  };
+  } as const;
 
   return (
     <div className="bg-white dark:bg-gray-900 p-6 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm group hover:border-blue-500/30 transition-all">
@@ -212,17 +219,32 @@ const StatCard = ({ title, value, trend, Icon, color }) => {
   );
 };
 
-const ActivityRow = ({ icon: Icon, label, desc, time, color }) => {
-  const colorMap = {
-    blue: "text-blue-600 bg-blue-50 dark:bg-blue-900/20",
-    emerald: "text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20",
-    orange: "text-orange-600 bg-orange-50 dark:bg-orange-900/20",
-    purple: "text-purple-600 bg-purple-50 dark:bg-purple-900/20",
-  };
+// derive keys from object instead of wrong type usage
+const activityColorMap = {
+  blue: "text-blue-600 bg-blue-50 dark:bg-blue-900/20",
+  emerald: "text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20",
+  orange: "text-orange-600 bg-orange-50 dark:bg-orange-900/20",
+  purple: "text-purple-600 bg-purple-50 dark:bg-purple-900/20",
+} as const;
 
+type ActivityRowProps = {
+  icon: React.ComponentType<{ size?: number }>;
+  label: string;
+  desc: string;
+  time: string;
+  color: keyof typeof activityColorMap;
+};
+
+const ActivityRow = ({
+  icon: Icon,
+  label,
+  desc,
+  time,
+  color,
+}: ActivityRowProps) => {
   return (
     <div className="flex items-center gap-4 p-3 rounded-2xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors border border-transparent hover:border-gray-100 dark:hover:border-gray-700">
-      <div className={`p-2 rounded-xl ${colorMap[color]}`}>
+      <div className={`p-2 rounded-xl ${activityColorMap[color]}`}>
         <Icon size={16} />
       </div>
       <div className="flex-1">
@@ -238,7 +260,13 @@ const ActivityRow = ({ icon: Icon, label, desc, time, color }) => {
   );
 };
 
-const ProgressItem = ({ label, value, color }) => (
+type ProgressItemProps = {
+  label: string;
+  value: number;
+  color: string; // keeps your original usage intact (bg-*)
+};
+
+const ProgressItem = ({ label, value, color }: ProgressItemProps) => (
   <div className="space-y-2">
     <div className="flex justify-between items-center">
       <span className="text-xs font-black text-gray-500 dark:text-gray-400 uppercase tracking-tighter">
@@ -252,7 +280,7 @@ const ProgressItem = ({ label, value, color }) => (
       <div
         className={`h-full ${color} rounded-full`}
         style={{ width: `${value}%` }}
-      ></div>
+      />
     </div>
   </div>
 );

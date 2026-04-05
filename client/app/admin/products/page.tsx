@@ -82,7 +82,7 @@ function SuitPages() {
       <div className="p-8 mt-12 bg-slate-50 flex flex-col md:flex-row justify-between items-center gap-4 text-[9px] uppercase tracking-[0.3em] font-bold text-slate-400 border-t border-slate-200">
         <div className="flex items-center gap-2">
           <ShieldCheck size={12} className="text-amber-700" />
-          Secure Inventory Management System v2.4
+          Secure Inventory Management System 
         </div>
         <p>© 2026 TOKSIDO SUITS ATELIER — CRAFTED FOR EXCELLENCE</p>
       </div>
