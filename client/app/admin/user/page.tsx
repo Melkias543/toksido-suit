@@ -1,3 +1,4 @@
+import UserList from '@/src/components/user'
 import React from 'react'
 
 function page() {
@@ -6,6 +7,8 @@ function page() {
         
 
         {/* <TableDemo /> */}
+
+        <UserList />
     </div>
   )
 }
