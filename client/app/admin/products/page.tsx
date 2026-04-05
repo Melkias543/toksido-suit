@@ -5,6 +5,7 @@ import React, { useState } from "react";
 import suits from "@/src/data/suits";
 import { Plus, Package, ShieldCheck, TrendingUp } from "lucide-react"; // Icons add a premium feel
 import { SuitDialog } from "@/src/components/AddNewSuitDialog";
+import ProductCard from "@/src/components/ProductCard";
 
 function SuitPages() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -75,7 +76,10 @@ function SuitPages() {
 
       {/* --- GRID SECTION --- */}
       <div className="max-w-[1600px] mx-auto">
-        <AdminSuitsGrid />
+        {/* <AdminSuitsGrid /> */}
+        <ProductCard suits={suits}
+        isAdmin={true}
+        />
       </div>
 
       {/* --- FOOTER STATUS --- */}
