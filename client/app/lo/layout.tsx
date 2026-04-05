@@ -1,6 +1,6 @@
 import React from 'react'
 
-function layout() {
+const layout = () => {
   return (
     <div>layout</div>
   )
