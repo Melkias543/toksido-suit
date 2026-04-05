@@ -13,8 +13,11 @@ import {
   User,
   ArrowUpRight,
 } from "lucide-react";
-
-const CentralDashboard = ({ isDark, setIsDark }) => {
+type Props = {
+  isDark: boolean;
+  setIsDark: React.Dispatch<React.SetStateAction<boolean>>;
+};
+const CentralDashboard = ({ isDark, setIsDark }: Props) => {
   return (
     <div className="flex-1 w-full bg-gray-50 dark:bg-gray-950 p-4 md:p-8 overflow-y-auto transition-colors duration-300">
       {/* --- TOP HEADER --- */}
@@ -180,8 +183,15 @@ const CentralDashboard = ({ isDark, setIsDark }) => {
 };
 
 // --- SMALL UI HELPERS ---
+type StatCardProps = {
+  title: string;
+  value: string;
+  trend: string;
+  Icon: React.ElementType;
+  color: "blue" | "emerald" | "purple" | "orange";
+};
 
-const StatCard = ({ title, value, trend, Icon, color }) => {
+const StatCard = ({ title, value, trend, Icon, color }:StatCardProps) => {
   const colorMap = {
     blue: "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20",
     emerald:
@@ -212,7 +222,20 @@ const StatCard = ({ title, value, trend, Icon, color }) => {
   );
 };
 
-const ActivityRow = ({ icon: Icon, label, desc, time, color }) => {
+type ActivityRowProps = {
+  icon: React.ElementType;
+  label: string;
+  desc: string;
+  time: string;
+  color: "blue" | "emerald" | "orange" | "purple";
+};
+const ActivityRow = ({
+  icon: Icon,
+  label,
+  desc,
+  time,
+  color,
+}:ActivityRowProps) => {
   const colorMap = {
     blue: "text-blue-600 bg-blue-50 dark:bg-blue-900/20",
     emerald: "text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20",
@@ -237,8 +260,12 @@ const ActivityRow = ({ icon: Icon, label, desc, time, color }) => {
     </div>
   );
 };
-
-const ProgressItem = ({ label, value, color }) => (
+type ProgressItemProps = {
+  label: string;
+  value: number;
+  color: "blue" | "emerald" | "orange" | "purple";
+};
+const ProgressItem = ({ label, value, color }: ProgressItemProps) => (
   <div className="space-y-2">
     <div className="flex justify-between items-center">
       <span className="text-xs font-black text-gray-500 dark:text-gray-400 uppercase tracking-tighter">
