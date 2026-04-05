@@ -85,7 +85,7 @@ const ProductDetail = () => {
                 </h1>
                 <div className="flex items-center justify-between pt-2">
                   <span className="text-3xl font-black text-gray-900 dark:text-white">
-                    ${suit.price}
+                    {suit.price} ETB
                   </span>
                   <div className="flex items-center text-yellow-400 text-sm font-bold bg-yellow-400/10 px-3 py-1 rounded">
                     {suit.rating} ★
