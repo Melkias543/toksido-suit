@@ -88,7 +88,7 @@ const LandingPage = () => {
 
                   <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-100 dark:border-gray-700">
                     <span className="text-2xl font-black text-gray-900 dark:text-white">
-                      ${suit.price}
+                      {suit.price} ETB
                     </span>
                     <button className="bg-gray-900 dark:bg-gray-100 dark:text-gray-900 text-white px-6 py-2.5 rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-yellow-400 hover:text-gray-900 transition-all">
                       Add to Cart
