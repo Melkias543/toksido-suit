@@ -33,38 +33,43 @@ interface SidebarProps {
 // Updated navigation items - remove logout from here
 const navigationItems: NavigationItem[] = [
   { id: "dashboard", name: "Dashboard", icon: Home, href: "/admin/dashboard" },
-  { id: "analytics", name: "Analytics", icon: BarChart3, href: "/analytics" },
+  // { id: "analytics", name: "Analytics", icon: BarChart3, href: "/analytics" },
   {
     id: "suites",
     name: "Suites",
     icon: FileText,
-    href: "/products",
+    href: "/admin/products",
     badge: "3",
   },
   {
     id: "User Management",
     name: "User Management",
     icon: User,
-    href: "/user-management",
+    href: "/admin/user",
     badge: "5",
   },
-  { id: "Reports", name: "Reports", icon: FileText, href: "/reports" },
-  { id: "", name: "Settings", icon: Settings, href: "/settings" },
-  {
-    id: "Suit-Categories",
-    name: "Suit Categories",
-    icon: HelpCircle,
-    href: "/help",
-  },
+  { id: "Reports and Analytics", 
+    name: "Reports", 
+    icon: FileText, 
+    href: "/admin/reports" },
+
+  { id: "settings", name:"Settings",
+     icon: Settings, href: "/admin/settings" },
+  // {
+  //   id: "Suit-Categories",
+  //   name: "Suit Categories",
+  //   icon: HelpCircle,
+  //   href: "/help",
+  // },
   {
     id: "services",
     name: "Our Services",
     icon: HelpCircle,
-    href: "/help",
+    href: "/admin/services",
   },
 ];
 
-export function Sidebar({ className = "" }: SidebarProps) {
+export  function Sidebar({ className = "" }: SidebarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [activeItem, setActiveItem] = useState("dashboard");
