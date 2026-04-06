@@ -266,6 +266,7 @@ type ProgressItemProps = {
   color: string; // keeps your original usage intact (bg-*)
 };
 
+
 const ProgressItem = ({ label, value, color }: ProgressItemProps) => (
   <div className="space-y-2">
     <div className="flex justify-between items-center">
