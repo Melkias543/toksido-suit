@@ -18,3 +18,4 @@ const reviewSchema = new mongo.Schema({
 }, { timestamps: true })
 
 export const Review = mongo.model('Review', reviewSchema)
+

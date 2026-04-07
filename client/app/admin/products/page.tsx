@@ -19,7 +19,7 @@ function SuitPages() {
               System Administration
             </h2>
             <h1 className="text-5xl md:text-6xl font-black tracking-tighter text-slate-950">
-              Atelier{" "}
+              Atelier
               <span className="font-serif italic text-amber-700">
                 Inventory
               </span>
