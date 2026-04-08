@@ -5,6 +5,7 @@ const objectIdValidator = (val) => /^[0-9a-fA-F]{24}$/.test(val);
 
 // --- Product ---
 export const productSchema = z.object({
+  _id: z.string().refine(objectIdValidator, { message: "Invalid Product ID" }).optional(),
   name: z.object({
     en: z.string().trim().optional(),
     am: z.string().trim().optional(),
@@ -19,7 +20,7 @@ export const productSchema = z.object({
     or: z.string().trim().optional(),
   }).optional(),
   price: z.number().min(0, { message: "Price cannot be negative" }),
-  category_id: z.string().refine(objectIdValidator, { message: "Invalid Category ID" }).optional(),
+  category_id: z.string(),
 // image: z
 //   .custom() // More flexible than instanceof
 //   .refine((file) => !!file, "Image is required")
@@ -40,6 +41,7 @@ image: z.any()
 
 // --- Category ---
 export const categorySchema = z.object({
+  _id: z.string().refine(objectIdValidator, { message: "Invalid Category ID" }).optional(),
   name: z.object({
     en: z.string().trim().optional(),
     am: z.string().trim().optional(),
@@ -48,11 +50,7 @@ export const categorySchema = z.object({
     val => val.en || val.am || val.or,
     { message: "You must provide a name in at least one language (en, am, or or)" }
   ),
-  description: z.object({
-    en: z.string().trim().optional(),
-    am: z.string().trim().optional(),
-    or: z.string().trim().optional(),
-  }).optional(),
+
 });
 
 // --- Review ---
@@ -65,6 +63,7 @@ export const reviewSchema = z.object({
 
 // --- Service ---
 export const serviceSchema = z.object({
+  _id: z.string().refine(objectIdValidator, { message: "Invalid Service ID" }).optional(),
   name: z.object({
     en: z.string().trim().optional(),
     am: z.string().trim().optional(),

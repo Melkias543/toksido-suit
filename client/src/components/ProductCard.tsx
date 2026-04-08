@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link.js";
 import { MoreHorizontal, Edit2, Trash2 } from "lucide-react"; // Better icons
@@ -13,12 +13,19 @@ import {
 import suits from "@/src/data/suits";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { AnyARecord } from "dns";
+import { getAllCategories, getAllProducts } from "../api/AdminApi";
 interface ProductCardProps {
   suits: any; // Ideally, define a proper interface for your suit
   isAdmin: boolean;
 }
+import Cookies from "js-cookie";
+type Lang = "en" | "am" | "or";  
+const imagePath = process.env.NEXT_IMAGES_URL||"http://localhost:8000"; // Fallback to localhost if env variable is not set
+
 function ProductCard({ suits, isAdmin }: ProductCardProps) {
   // Dummy category data using colors as placeholders to avoid Next.js Image errors
+  const [suitsData, setSuitsData] = useState([]);
   const categories = [
     { id: 1, name: "Wedding", color: "bg-blue-900", count: "12 Styles" },
     { id: 2, name: "Business", color: "bg-gray-800", count: "18 Styles" },
@@ -26,6 +33,34 @@ function ProductCard({ suits, isAdmin }: ProductCardProps) {
     { id: 4, name: "Bespoke", color: "bg-zinc-900", count: "5 Styles" },
   ];
 
+useEffect(() => {
+  getALlSuits();
+}, []);
+
+const getALlSuits = async () => {
+try {
+  const response = await getAllProducts();
+  // console.log("Products fetched successfully:", response);
+  setSuitsData(response.products); // Assuming the API response has a 'products' field
+} catch (error:any) {
+
+  const errorDate= error.response?.data || error.message || "An unexpected error occurred.";
+  console.error("Error fetching suits:", errorDate);
+
+}
+
+
+}
+
+
+const locale = (Cookies.get("NEXT_LOCALE") as Lang) || "en";
+
+console.log("Suits data in ProductCard:", suitsData);
+
+// console.log(
+//   "first image URL:",
+//   `${process.env.NEXT_PUBLIC_IMAGES_URL}/uploads/${suitsData[0]?.image}`,
+// );
   return (
     <div className="bg-gray-50 dark:bg-gray-900 min-h-screen text-gray-900 dark:text-gray-100 transition-colors duration-500">
       {/* --- CATEGORY GRID SECTION --- */}
@@ -70,16 +105,16 @@ function ProductCard({ suits, isAdmin }: ProductCardProps) {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
-          {suits.map((suit: any) => (
+          {suitsData?.map((suit: any) => (
             <div
-              key={suit.id}
+              key={suit._id}
               className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden group hover:shadow-2xl transition-all duration-500 border border-transparent hover:border-yellow-400/20"
             >
-              <Link href={`/product/${suit.id}`}>
+              <Link href={`/product/${suit._id}`}>
                 <div className="relative w-full h-100 overflow-hidden">
                   <Image
-                    src={suit.image}
-                    alt={suit.title}
+                    src={`${process.env.NEXT_PUBLIC_IMAGES_URL}/uploads/${suit.image}`}
+                    alt={suit?.name[locale] || "IMAGE"}
                     fill
                     className="object-cover transition-transform duration-1000 group-hover:scale-110"
                     priority
@@ -91,14 +126,16 @@ function ProductCard({ suits, isAdmin }: ProductCardProps) {
 
               <div className="p-6">
                 <div className="flex justify-between items-center mb-3">
-                  <h3 className="text-xl font-bold">{suit.title}</h3>
+                  <h3 className="text-xl font-bold">
+                    {suit.name[locale] || suit.name['en']}
+                  </h3>
                   <div className="flex items-center text-yellow-400 text-sm font-bold bg-yellow-400/10 px-2 py-1 rounded">
-                    {suit.rating} <span className="ml-1">★</span>
+                    {suit?.rating || "N/A"} <span className="ml-1">★</span>
                   </div>
                 </div>
 
                 <p className="text-gray-500 dark:text-gray-400 text-sm mb-6 leading-relaxed line-clamp-2">
-                  {suit.description}
+                  {suit?.description[locale] || suit?.description["en"]}
                 </p>
 
                 <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-100 dark:border-gray-700">
@@ -109,7 +146,7 @@ function ProductCard({ suits, isAdmin }: ProductCardProps) {
                     
                   )} */}
 
-                  {isAdmin ?(
+                  {isAdmin ? (
                     <CardFooter className="flex justify-between items-center p-5 border-t border-slate-50">
                       <Link
                         href={`/admin/edit/${suit.id}`}
@@ -160,12 +197,9 @@ function ProductCard({ suits, isAdmin }: ProductCardProps) {
                     </CardFooter>
                   ) : (
                     <button className="bg-gray-900 dark:bg-gray-100 dark:text-gray-900 text-white px-6 py-2.5 rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-yellow-400 hover:text-gray-900 transition-all">
-                    Make Your  Favorite
+                      Make Your Favorite
                     </button>
-                  ) 
-                   
-                  
-                  }
+                  )}
                 </div>
               </div>
             </div>
