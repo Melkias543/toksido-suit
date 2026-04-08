@@ -1,16 +1,26 @@
-import mongoose from 'mongoose'
+import mongoose from 'mongoose';
+
+// 1. Define the multi-lang structure as a reusable Schema
+const localizedStringSchema = new mongoose.Schema({
+  en: { type: String, trim: true },
+  am: { type: String, trim: true },
+  or: { type: String, trim: true }
+}, { _id: false }); // _id: false prevents Mongoose from adding IDs to every name object
 
 const productSchema = new mongoose.Schema({
   name: {
-    // Individual 'required: true' removed to allow any single language to work
-    en: { type: String, trim: true },
-    am: { type: String, trim: true },
-    or: { type: String, trim: true }
+    type: localizedStringSchema,
+    // Move the validator INLINE here
+    validate: {
+      validator: function (value) {
+        // 'value' is the localizedString object
+        return !!(value.en || value.am || value.or);
+      },
+      message: 'A product name must be provided in at least one language.'
+    }
   },
   description: {
-    en: { type: String, trim: true },
-    am: { type: String, trim: true },
-    or: { type: String, trim: true }
+    type: localizedStringSchema
   },
   price: {
     type: Number,
@@ -24,22 +34,9 @@ const productSchema = new mongoose.Schema({
     type: String,
     required: true 
   }
-}, { timestamps: true })
+}, { timestamps: true });
 
-/**
- * THE FIX: Custom Path Validator
- * This ensures the 'name' object isn't empty. 
- * It will pass if 'en', 'am', OR 'or' has a value.
- */
-productSchema.path('name').validate(function (value) {
-  return !!(value.en || value.am || value.or);
-}, 'A product name must be provided in at least one language (English, Amharic, or Afan Oromo).');
+// Indexing remains the same
+productSchema.index({ 'name.en': 1 }, { sparse: true });
 
-/**
- * INDEXING
- * Use 'sparse: true' so that if 'name.en' is missing, 
- * MongoDB doesn't throw errors for multiple empty values.
- */
-productSchema.index({ 'name.en': 1 }, { sparse: true })
-
-export const Product = mongoose.model('Product', productSchema)
+export const Product = mongoose.model('Product', productSchema);

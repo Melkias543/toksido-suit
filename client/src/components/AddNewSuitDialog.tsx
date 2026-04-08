@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
@@ -32,35 +32,60 @@ import { Globe, Package, DollarSign, Camera, X, ImageIcon } from "lucide-react";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { productSchema } from "../utils/libs/sanitize";
+import { categorySchema, productSchema } from "../utils/libs/sanitize";
 import z from "zod";
 import Swal from "sweetalert2";
+import AddCategory from "./AddCategory";
+import { createProduct, getAllCategories } from "../api/AdminApi";
 type ProductForm = z.infer<typeof productSchema>;
+import Cookies from "js-cookie";
 const languages = ["en", "am", "or"] as const;
+type Lang = "en" | "am" | "or";
 interface SuitDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
 }
+type CategoryFormValues = z.infer<typeof categorySchema>;
 
 export function SuitDialog({ isOpen, onOpenChange }: SuitDialogProps) {
+  const [openForCategory, setOpenForCategory] = useState(false);
+
   const [preview, setPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-const {
-  handleSubmit,
-  register,
-  setValue,
-  formState: { errors, isSubmitting },
-} = useForm({
-  resolver: zodResolver(productSchema),
-  defaultValues: {
-    name: { en: "", am: "", or: "" },
-    description: { en: "", am: "", or: "" },
-    category_id: "",
-    price: 0,
-    image: null,
-  },
-});
-const { ref: registerRef, ...imageRegisterProps } = register("image");
+  const [categories, setCategories] = useState<CategoryFormValues[]>([]);
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async () => {
+    try {
+      const data = await getAllCategories();
+      // console.log("Fetched categories:", data.categories);
+      setCategories(data?.categories);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
+  const locale = Cookies.get("NEXT_LOCALE") || ("en" as Lang);
+  // console.log("Language from cookies:", locale);
+
+  const {
+    handleSubmit,
+    register,
+    setValue,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    resolver: zodResolver(productSchema),
+    defaultValues: {
+      name: { en: "", am: "", or: "" },
+      description: { en: "", am: "", or: "" },
+      category_id: "",
+      price: 0,
+      image: null,
+    },
+  });
+  const { ref: registerRef, ...imageRegisterProps } = register("image");
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -72,37 +97,76 @@ const { ref: registerRef, ...imageRegisterProps } = register("image");
       setValue("image", file, { shouldValidate: true });
     }
   };
- const removeImage = (e: React.MouseEvent) => {
-   e.preventDefault();
-   e.stopPropagation();
-   if (preview) URL.revokeObjectURL(preview); // ✅ important
-   setPreview(null);
- };
+  const removeImage = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (preview) URL.revokeObjectURL(preview); // ✅ important
+    setPreview(null);
+  };
 
-
-// const { ref, onChange, ...rest } = register("image");
-
-
-  const onSubmit = (data: any) => {
-    console.log("Form Data:", data);
+  const onSubmit = async (data: any) => {
+    console.log(" Data:", data);
     try {
+      if (!data.category_id) {
+        Swal.fire({
+          icon: "error",
+          title: "Validation Failed",
+          text: "Please select a category",
+          confirmButtonText: "OK",
+        });
+        return;
+      }
       const formData = new FormData();
-      formData.append("image", data.image[0]);
+      if (data.image) {
+        // Extract the file whether it's in a FileList or a single File
+        const fileToUpload =
+          data.image instanceof FileList ? data.image[0] : data.image;
+
+        if (fileToUpload) {
+          // FORCE binary recognition by wrapping it in a new Blob
+          const binaryFile = new Blob([fileToUpload], {
+            type: fileToUpload.type,
+          });
+
+          // Append the Blob and provide the original filename
+          formData.append("image", binaryFile, fileToUpload.name);
+
+          console.log("Binary file attached:", fileToUpload.name);
+        }
+      }
+
       formData.append("price", data.price);
-      formData.append("name", JSON.stringify(data.name));
-      formData.append("description", JSON.stringify(data.description));
+      formData.append("name[en]", data.name.en);
+      formData.append("name[am]", data.name.am);
+      formData.append("name[or]", data.name.or);
+
+      formData.append("description[en]", data.description.en);
+      formData.append("description[am]", data.description.am);
+      formData.append("description[or]", data.description.or);
+      formData.append("category_id", data.category_id);
       console.log("Form Data to be submitted:", formData);
+      const product = await createProduct(formData);
+      Swal.fire({
+        title: "Success!",
+        text: product?.message || "Suit added to inventory successfully.",
+        icon: "success",
+        confirmButtonText: "OK",
+      });
+      reset();
+      onOpenChange(false);
     } catch (error: any) {
-      const errors = error.response?.data?.message || error.message || "An error occurred while submitting the suit.";
+      const errors =
+        error.response?.data?.message ||
+        error.message ||
+        "An error occurred while submitting the suit.";
       Swal.fire({
         icon: "error",
         title: "Submission Failed",
         text: errors,
+        confirmButtonText: "OK",
       });
     }
-  }
-
-
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -143,47 +207,63 @@ const { ref: registerRef, ...imageRegisterProps } = register("image");
                     </p>
                   )}
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-2 w-2.5">
                   <Label className="text-[10px] font-black uppercase tracking-widest flex items-center gap-2 text-slate-950">
                     <Package size={14} className="text-amber-700" /> Category
                   </Label>
 
                   <div className="flex flex-col gap-2">
                     <Select
-                    {
-                      ...register("category_id")
-                    }
+                      onValueChange={(value) => {
+                        setValue("category_id", value); // 🔥 THIS is the fix
+                      }}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Select a category" />
                       </SelectTrigger>
+
                       <SelectContent>
                         <SelectGroup>
                           <SelectLabel>Categories</SelectLabel>
-                          <Button
-                          className="bg-stone-600 hover:bg-stone-800"
-                            variant="outline"
-                            size="sm"
-                            onClick={() => console.log("Add new category")}
-                          >
-                            Add New Category
-                          </Button>
-                          <SelectItem value="category1">Category 1</SelectItem>
-                          <SelectItem value="category2">Category 2</SelectItem>
-                          <SelectItem value="category3">Category 3</SelectItem>
+
+                          {categories.map((category) => (
+                            <SelectItem key={category._id} value={category._id}>
+                              {category.name.locale ||
+                                category.name.en ||
+                                category.name.am ||
+                                category.name.or ||
+                                "Unnamed Category"}
+                            </SelectItem>
+                          ))}
+                          <div className="relative flex w-full cursor-default select-none items-center py-1.5 pl-8 pr-2 text-sm outline-none border-t mt-2">
+                            <button
+                              type="button"
+                              className="w-full text-left text-amber-900 font-bold hover:underline"
+                              onClick={(e) => {
+                                e.preventDefault(); // Prevent the Select from closing immediately if needed
+                                setOpenForCategory(true);
+                              }}
+                            >
+                              + Add New Category
+                            </button>
+                          </div>
                         </SelectGroup>
                       </SelectContent>
                     </Select>
                   </div>
-                  {
-                    errors.category_id && (
-                      <p className="text-red-600 text-sm mt-1">
-                        {errors.category_id.message}
-                      </p>
-                    )
-                  }
+
+                  {errors.category_id && (
+                    <p className="text-red-600 text-sm mt-1">
+                      {errors.category_id.message}
+                    </p>
+                  )}
                 </div>
               </div>
+
+              <AddCategory
+                openForCategory={openForCategory}
+                setOpenForCategory={setOpenForCategory}
+              />
 
               {/* Right Column: Image Upload */}
               <div className="space-y-2">
@@ -235,6 +315,11 @@ const { ref: registerRef, ...imageRegisterProps } = register("image");
                     </>
                   )}
                 </div>
+                {errors.image && (
+                  <p className="text-red-600 text-sm mt-1">
+                    {errors.image.message}
+                  </p>
+                )}
               </div>
             </div>
 

@@ -2,19 +2,18 @@ import express from "express";
 import ProductController from "../controllers/product.controller.js";
 import { validate } from "../middlewares/validate.js";
 import { productSchemaValidator } from "../validator/productValidator.js";
-const router = express.Router();
-import upload from "../utils/ multerConfig.js";
+const productRouter = express.Router();
+import {upload} from "../utils/ multerConfig.js";
+import multer from "multer";
+import multerMiddleware from "../middlewares/multer.midlware.js";
 
-router.get("/", (req, res) => {
-  res.send("Product route");
-});
-router.post('/products', upload.single("image"), (req, res, next) => {
-    // Attach the uploaded filename to req.body.image for Joi validation
-    if (req.file) req.body.image = req.file.filename;
-    next();
-  },validate(productSchemaValidator),  ProductController.createProduct);
-router.get('/products/:id',ProductController.getProductById);
-router.put('/products/:id',ProductController.updateProduct);
-router.delete('/products/:id',ProductController.deleteProduct);
+// productRouter.get("/", (req, res) => {
+//   res.send("Product route");
+// });
+productRouter.post("/create",multerMiddleware, validate(productSchemaValidator), ProductController.createProduct);
+productRouter.get('/products/:id',ProductController.getProductById);
+productRouter.put('/products/:id',ProductController.updateProduct);
+productRouter.delete('/products/:id',ProductController.deleteProduct);
+productRouter.get("/get-all", ProductController.getAllProducts);
 
-export default router;
+export default productRouter;

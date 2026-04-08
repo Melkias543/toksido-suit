@@ -1,36 +1,28 @@
-import mongoose from 'mongoose'
+import mongoose from 'mongoose';
+
+// 1. Define the language structure separately
+const languageSchema = new mongoose.Schema({
+  en: { type: String, trim: true },
+  am: { type: String, trim: true },
+  or: { type: String, trim: true }
+}, { _id: false }); // Stops Mongoose from creating sub-IDs for names
 
 const categorySchema = new mongoose.Schema({
   name: {
-    // We remove 'required: true' from individual fields to allow flexibility
-    en: { type: String, trim: true },
-    am: { type: String, trim: true },
-    or: { type: String, trim: true }
-  },
-  description: {
-    en: { type: String, trim: true },
-    am: { type: String, trim: true },
-    or: { type: String, trim: true }
+    // FIX: Explicitly tell Mongoose that 'name' uses the languageSchema type
+    type: languageSchema,
+    required: true, 
+    validate: {
+      // FIX: Ensure 'validator' is lowercase
+      validator: function (value) {
+        return !!(value.en || value.am || value.or);
+      },
+      message: 'A category name must be provided in at least one language.'
+    }
   }
-}, { timestamps: true })
+}, { timestamps: true });
 
-/**
- * THE FIX: Custom Validator
- * This checks the 'name' object before saving. 
- * If all three are empty, it fails. If at least one has text, it passes.
- */
-categorySchema.path('name').validate(function (value) {
-  return !!(value.en || value.am || value.or);
-}, 'You must provide a name in at least one language (English, Amharic, or Afan Oromo).');
+// Sparse index for English names
+categorySchema.index({ 'name.en': 1 }, { unique: true, sparse: true });
 
-/**
- * INDEXING
- * We use 'sparse: true' because if 'en' is occasionally left blank, 
- * a standard unique index would cause errors with multiple empty values.
- */
-categorySchema.index({ 'name.en': 1 }, { 
-  unique: true, 
-  sparse: true 
-})
-
-export const Category = mongoose.model('Category', categorySchema)
+export const Category = mongoose.model('Category', categorySchema);
