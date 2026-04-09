@@ -36,8 +36,39 @@ try {
 
     },
     getProductById: async (id) => {},
-    updateProduct: async (id, updateData) => {},
-    deleteProduct: async (id) => {},
+
+
+   updateProduct: async (id, updateData) => {
+    try {
+        const updatedProduct = await Product.findByIdAndUpdate(
+           {  _id:  id},
+            { $set: updateData }, // Using $set ensures only the passed fields are changed
+            { 
+              runValidators: true // Ensures the update follows your Schema rules
+            }
+        );
+
+        if (!updatedProduct) {
+            throw new Error("Product not found");
+        }
+
+        return updatedProduct;
+    } catch (error) {
+        throw error;
+    }},
+
+    deleteProduct: async (id) => {
+try {
+      const deletedProduct = await Product.findByIdAndDelete(id);
+
+      return deletedProduct
+} catch (error) {
+  console.error("Error During Deleteing Product",error)
+  throw error
+}
+
+
+    },
 }
 
 

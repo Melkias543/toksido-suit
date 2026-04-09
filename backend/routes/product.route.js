@@ -12,8 +12,8 @@ import multerMiddleware from "../middlewares/multer.midlware.js";
 // });
 productRouter.post("/create",multerMiddleware, validate(productSchemaValidator), ProductController.createProduct);
 productRouter.get('/products/:id',ProductController.getProductById);
-productRouter.put('/products/:id',ProductController.updateProduct);
-productRouter.delete('/products/:id',ProductController.deleteProduct);
+productRouter.put('/:id',multerMiddleware, validate(productSchemaValidator),   ProductController.updateProduct);
+productRouter.delete('/:id',ProductController.deleteProduct);
 productRouter.get("/get-all", ProductController.getAllProducts);
 
 export default productRouter;

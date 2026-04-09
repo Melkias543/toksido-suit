@@ -1,4 +1,6 @@
+import { response } from "express";
 import ProudctService from "../services/product.service.js";
+import mongoose from "mongoose";
 
 const productController = {
     createProduct: async(req, res) => {
@@ -52,16 +54,72 @@ return res.status(200).json({ message: "Products fetched successfully", products
   },
 
   updateProduct: async(req, res) => {
+
+  try {
+      
     const { id } = req.params;
-    const { name, price } = req.body;
+ 
+if (!mongoose.Types.ObjectId.isValid(id)) {
+  return res.status(400).json({
+    status: false,
+    message: "Provide valid Mongo ID"
+  });
+}
+   const {image,price,description,name ,category_id} = req.body;
     // Logic to update an existing product in the database
-    res.json({ message: `Product        with ID ${id} updated successfully`, product: { name, price } });
+
+    const result = await ProudctService.updateProduct(id,{image,price,description,name ,category_id})
+if(!result){
+  return res.status(400).json({
+    status:false,
+    message:"Fail to Update Product."
+  })
+}
+
+
+ res.json({
+      status: true,
+      message: `Product updated successfully`,
+      product: result,
+    });
+  } catch (error) {
+    console.error("Update Error:", error);
+    res.status(500).json({ status: false, message: "Internal Server Error During Update Product." });
+  }
+
+
   },
+
+
+
+
   deleteProduct: async(req, res) => {
     const { id } = req.params;
     // Logic to delete a product from the database
-    res.json({ message: `Product with ID ${id} deleted successfully` });
-  }
+
+
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        status: false,
+        message: "Invalid or missing ID",
+      });
+    }
+
+    const deletedProduct= await ProudctService.deleteProduct(id)
+
+ // 🔹 If not found
+    if (!deletedProduct) {
+      return res.status(404).json({
+        status: false,
+        message: "Fail To Delete Product.",
+      });
+    }
+
+    // 🔹 Success
+    return res.status(200).json({
+      status: true,
+      message: "Product deleted successfully",
+    });  }
 };
 
 export default productController;
