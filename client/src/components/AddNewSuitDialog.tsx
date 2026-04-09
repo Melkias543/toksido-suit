@@ -36,7 +36,7 @@ import { categorySchema, productSchema } from "../utils/libs/sanitize";
 import z from "zod";
 import Swal from "sweetalert2";
 import AddCategory from "./AddCategory";
-import { createProduct, getAllCategories } from "../api/AdminApi";
+import { createProduct, getAllCategories, updateProduct } from "../api/AdminApi";
 type ProductForm = z.infer<typeof productSchema>;
 import Cookies from "js-cookie";
 const languages = ["en", "am", "or"] as const;
@@ -44,12 +44,17 @@ type Lang = "en" | "am" | "or";
 interface SuitDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
+  suitToEdit?: any; 
 }
 type CategoryFormValues = z.infer<typeof categorySchema>;
 
-export function SuitDialog({ isOpen, onOpenChange }: SuitDialogProps) {
+export function SuitDialog({
+  isOpen,
+  onOpenChange,
+  suitToEdit,
+}: SuitDialogProps) {
   const [openForCategory, setOpenForCategory] = useState(false);
-
+  const isEditMode = !!suitToEdit;
   const [preview, setPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [categories, setCategories] = useState<CategoryFormValues[]>([]);
@@ -68,7 +73,6 @@ export function SuitDialog({ isOpen, onOpenChange }: SuitDialogProps) {
   };
   const locale = Cookies.get("NEXT_LOCALE") || ("en" as Lang);
   // console.log("Language from cookies:", locale);
-
   const {
     handleSubmit,
     register,
@@ -104,8 +108,36 @@ export function SuitDialog({ isOpen, onOpenChange }: SuitDialogProps) {
     setPreview(null);
   };
 
+  // 🔥 EFFECT: Populate form when suitToEdit changes
+  useEffect(() => {
+    if (isEditMode && suitToEdit) {
+      reset({
+        name: suitToEdit.name,
+        description: suitToEdit.description,
+        category_id: suitToEdit.category_id,
+        price: suitToEdit.price,
+        image: null, // Images usually handled separately via preview
+      });
+      // Set image preview if editing and an image exists
+      if (suitToEdit.image) {
+        setPreview(
+          `${process.env.NEXT_PUBLIC_IMAGES_URL}/uploads/${suitToEdit.image}`,
+        );
+      }
+    } else {
+      reset({
+        name: { en: "", am: "", or: "" },
+        description: { en: "", am: "", or: "" },
+        category_id: "",
+        price: 0,
+        image: null,
+      });
+      setPreview(null);
+    }
+  }, [suitToEdit, isOpen, reset]);
+
   const onSubmit = async (data: any) => {
-    console.log(" Data:", data);
+    // console.log(" Data:", data);
     try {
       if (!data.category_id) {
         Swal.fire({
@@ -131,7 +163,7 @@ export function SuitDialog({ isOpen, onOpenChange }: SuitDialogProps) {
           // Append the Blob and provide the original filename
           formData.append("image", binaryFile, fileToUpload.name);
 
-          console.log("Binary file attached:", fileToUpload.name);
+          // console.log("Binary file attached:", fileToUpload.name);
         }
       }
 
@@ -144,11 +176,26 @@ export function SuitDialog({ isOpen, onOpenChange }: SuitDialogProps) {
       formData.append("description[am]", data.description.am);
       formData.append("description[or]", data.description.or);
       formData.append("category_id", data.category_id);
-      console.log("Form Data to be submitted:", formData);
-      const product = await createProduct(formData);
+      // console.log("Form Data to be submitted:", formData);
+      // const product = await createProduct(formData);
+let response;
+if (isEditMode) {
+  // 🔥 Update Existing
+  response = await updateProduct(suitToEdit._id, formData);
+
+} else {
+  // 🆕 Create New
+  response = await createProduct(formData);
+}
+
+
+
+
       Swal.fire({
-        title: "Success!",
-        text: product?.message || "Suit added to inventory successfully.",
+        title: `${isEditMode ? "updated" : "Created"}`,
+        text:
+          response?.message ||
+          `Suit ${isEditMode ? "updated" : "added"} successfully.`,
         icon: "success",
         confirmButtonText: "OK",
       });
@@ -291,7 +338,8 @@ export function SuitDialog({ isOpen, onOpenChange }: SuitDialogProps) {
                         src={preview}
                         alt="Preview"
                         fill
-                        className="object-cover"
+                        className="object-contain p-2" // Changed from object-cover to object-contain
+                        sizes="(max-width: 768px) 100vw, 53vw"
                       />
                       <button
                         onClick={(e) => {
@@ -315,9 +363,9 @@ export function SuitDialog({ isOpen, onOpenChange }: SuitDialogProps) {
                     </>
                   )}
                 </div>
-                {errors.image && (
+                {errors.image?.message && (
                   <p className="text-red-600 text-sm mt-1">
-                    {errors.image.message}
+                    {String(errors.image.message)}
                   </p>
                 )}
               </div>
@@ -400,7 +448,13 @@ export function SuitDialog({ isOpen, onOpenChange }: SuitDialogProps) {
               type="submit"
               className="rounded-none bg-slate-950 text-white hover:bg-amber-700 px-12 h-14 font-black uppercase text-xs tracking-[0.3em] transition-all shadow-[6px_6px_0px_0px_rgba(180,130,20,0.3)] active:translate-y-1 active:shadow-none cursor-pointer"
             >
-              {isSubmitting ? "Adding..." : "Add to Inventory"}
+              {isSubmitting
+                ? isEditMode
+                  ? "Saving..."
+                  : "Adding..."
+                : isEditMode
+                  ? "Update Piece"
+                  : "Add to Inventory"}{" "}
             </Button>
           </DialogFooter>
         </form>

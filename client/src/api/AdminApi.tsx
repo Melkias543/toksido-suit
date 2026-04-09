@@ -47,3 +47,32 @@ export const getAllProducts = async () => {
     throw error;
   }
 }
+
+
+export   const updateProduct=async(id:String, data:any)=>{
+  try {
+    // products;
+const resp = await apiClient.put(`/products/${id}`, data, {
+  headers: {
+    "Content-Type": "multipart/form-data",
+  },
+});
+return resp
+  } catch (error) {
+    throw error
+  }
+}
+
+
+export const deleteProduct = async (id:String) => {
+  try {
+    const res = await apiClient.delete(`/products/${id}`);
+return res
+
+
+} catch (err) {
+    console.error(err);
+
+    throw err
+  }
+};
