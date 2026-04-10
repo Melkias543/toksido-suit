@@ -24,10 +24,7 @@ const serviceSchema = new mongoose.Schema({
     type: localizedStringSchema
     // Optional: add a validator here too if description is required
   },
-  price: {
-    type: Number,
-    required: true
-  }
+
 }, { timestamps: true });
 
 /**
