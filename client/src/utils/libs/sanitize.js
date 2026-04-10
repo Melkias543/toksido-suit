@@ -77,7 +77,6 @@ export const serviceSchema = z.object({
     am: z.string().trim().optional(),
     or: z.string().trim().optional(),
   }).optional(),
-  price: z.number().min(0, { message: "Price cannot be negative" }),
 });
 
 // --- User ---

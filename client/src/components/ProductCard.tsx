@@ -85,7 +85,7 @@ function ProductCard({ suits, isAdmin }: ProductCardProps) {
       await Swal.fire({
         icon: "success",
         title: "Deleted!",
-        text: res?.message || "Product deleted successfully",
+        text: res?.data.message || "Product deleted successfully",
         timer: 2000,
         showConfirmButton: false,
       });
@@ -140,7 +140,9 @@ function ProductCard({ suits, isAdmin }: ProductCardProps) {
       {/* --- FEATURED PRODUCTS --- */}
       <section className="py-12 px-6 md:px-16 max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-12">
-          <h2 className="text-3xl font-bold">Featured Suits</h2>
+          <h2 className="text-3xl font-bold cursor-pointer hover:cursor-pointer">
+            Featured Suits
+          </h2>
           <div className="hidden md:block px bg-gray-200 dark:bg-gray-800 flex-grow mx-8"></div>
           <button className="text-sm font-bold text-yellow-500 uppercase tracking-widest hover:underline">
             View All
@@ -202,7 +204,6 @@ function ProductCard({ suits, isAdmin }: ProductCardProps) {
                           href={`/admin/edit/${suit.id}`}
                           className="w-full mr-2"
                         > */}
-
                         <Button
                           // href={`/admin/edit/${suit.id}`}
                           onClick={() => {
