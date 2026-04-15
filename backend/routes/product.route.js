@@ -13,7 +13,7 @@ import multerMiddleware from "../middlewares/multer.midlware.js";
 productRouter.post("/create",multerMiddleware, validate(productSchemaValidator), ProductController.createProduct);
 productRouter.get('/products/:id',ProductController.getProductById);
 productRouter.put('/:id',multerMiddleware, validate(productSchemaValidator),   ProductController.updateProduct);
-productRouter.delete('/:id',ProductController.deleteProduct);
+productRouter.delete('/:id' ,ProductController.deleteProduct);
 productRouter.get("/get-all", ProductController.getAllProducts);
 
 export default productRouter;

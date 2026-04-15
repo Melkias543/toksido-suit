@@ -16,7 +16,6 @@ import { Button } from "@/components/ui/button";
 import { AnyARecord } from "dns";
 import {
   deleteProduct,
-  getAllCategories,
   getAllProducts,
 } from "../api/AdminApi";
 interface ProductCardProps {
@@ -28,7 +27,6 @@ import NotFondPage from "./NotFondPage";
 import { SuitDialog } from "./AddNewSuitDialog";
 import Swal from "sweetalert2";
 type Lang = "en" | "am" | "or";
-const imagePath = process.env.NEXT_IMAGES_URL || "http://localhost:8000"; // Fallback to localhost if env variable is not set
 
 function ProductCard({ suits, isAdmin }: ProductCardProps) {
   // Dummy category data using colors as placeholders to avoid Next.js Image errors

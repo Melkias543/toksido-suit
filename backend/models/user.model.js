@@ -1,7 +1,7 @@
 import mongo from 'mongoose'
 
 const userSchema = new mongo.Schema({
-  name: {
+  username: {
     type: String,
     required: true
   },
@@ -16,7 +16,8 @@ const userSchema = new mongo.Schema({
   },
   role_id: {
     type: mongo.Schema.Types.ObjectId,
-    ref: 'Role'
+    ref: 'Role',
+    reqiured:true
   },
   phone: String
 }, { timestamps: true })
