@@ -1,39 +1,46 @@
-import React from 'react'
-import LocaleSwitcher from './LocaleSwitcher'
+import React from "react";
+import LocaleSwitcher from "./LocaleSwitcher";
+import Link from "next/link";
 
 function NavBar() {
   return (
-    <div>  {/* --- STICKY NAVIGATION --- */}
-          <nav className="fixed top-0 w-full z-50 backdrop-blur-md bg-white/70 dark:bg-black/70 border-b border-gray-200 dark:border-gray-800">
-            <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 md:h-20 flex items-center justify-between">
-              <h2 className="text-xl md:text-2xl font-serif font-bold tracking-tighter uppercase">
-                Toksido
-              </h2>
-              <div className="hidden md:flex space-x-8 text-sm font-medium uppercase tracking-widest">
-                <a href="#" className="hover:text-yellow-500 transition">
-                  Collections
-                </a>
-                <a href="#" className="hover:text-yellow-500 transition">
-                  Bespoke
-                </a>
-                <a href="#" className="hover:text-yellow-500 transition">
-                  Showroom
-                </a>
-              </div>
-              <button className="border border-gray-900 dark:border-white px-4 py-2 text-[10px] md:text-xs uppercase tracking-widest hover:bg-gray-900 hover:text-white dark:hover:bg-white dark:hover:text-black transition">
-                Book Fitting
-              </button>
-              <LocaleSwitcher />
-            </div>
-          </nav></div>
-  )
+    <div>
+      {" "}
+      {/* --- STICKY NAVIGATION --- */}
+      <nav className="fixed top-0 w-full z-50 backdrop-blur-md bg-white/70 dark:bg-black/70 border-b border-gray-200 dark:border-gray-800">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 md:h-20 flex items-center justify-between">
+          <h2 className="text-xl md:text-2xl font-serif font-bold tracking-tighter uppercase">
+            Toksido
+          </h2>
+          <div className="hidden md:flex space-x-8 text-sm font-medium uppercase tracking-widest">
+            <Link href="/products" className="hover:text-yellow-500 transition">
+              Collections
+            </Link>
+            <a href="#" className="hover:text-yellow-500 transition">
+              Bespoke
+            </a>
+            <a href="#" className="hover:text-yellow-500 transition">
+              Showroom
+            </a>
+          </div>
+          <button className="border border-gray-900 dark:border-white px-4 py-2 text-[10px] md:text-xs uppercase tracking-widest hover:bg-gray-900 hover:text-white dark:hover:bg-white dark:hover:text-black transition">
+            Book Fitting
+          </button>
+          <LocaleSwitcher />
+
+          <Link
+            className="mt-[-3] px-6 py-2 border border-blue-600 text-blue-900 rounded-lg hover:bg-gray-500 hover:text-black  transition duration-200"
+            href="/auth/login"
+          >
+            Log In
+          </Link>
+        </div>
+      </nav>
+    </div>
+  );
 }
 
-export default NavBar
-
-
-
-
+export default NavBar;
 
 // import React from "react";
 // import LocaleSwitcher from "./LocaleSwitcher";

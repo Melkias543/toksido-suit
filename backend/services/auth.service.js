@@ -22,8 +22,9 @@ const AuthService = {
   },
   checkIfUserExist:async(email)=>{
 try {
-const user =User.findOne({ email })
-    if(!user){
+const user = await User.findOne({ email })
+
+if(!user){
         return false
     }
 
@@ -36,7 +37,7 @@ const user =User.findOne({ email })
 
   login: async ({ email }) => {
     try {
-      const user = await User.findOne({ email });
+      const user = await User.findOne({ email }).populate('role_id');;
       return user;
     } catch (error) {
         console.log("fail to login user by email", error.message);
