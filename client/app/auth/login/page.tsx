@@ -3,6 +3,12 @@ import React from "react";
 import Link from "next/link";
 
 function Login() {
+
+
+
+  
+
+
   return (
     <div className="min-h-screen bg-[#f8f5f0] flex items-center justify-center p-4 md:p-10 relative">
       {/* Subtle Texture Overlay */}

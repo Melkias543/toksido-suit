@@ -17,13 +17,19 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { serviceSchema } from "../utils/libs/sanitize";
 import Swal from "sweetalert2";
+import { createServices, updateServices } from "../api/AdminApi";
+import { useEffect } from "react";
+const languages = ["en", "am", "or"] as const;
 
 type props = {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
+  isEditing?: any;
 };
 
-export function ServiceDialog({ isOpen, setIsOpen }: props) {
+export function ServiceDialog({ isOpen, setIsOpen ,isEditing }: props) {
+const isEditMode =!!isEditing
+
   const {
     register,
     reset,
@@ -45,9 +51,50 @@ export function ServiceDialog({ isOpen, setIsOpen }: props) {
       },
     },
   });
+useEffect(()=>{
 
-  const onSubmit = async () => {
+
+if (isEditMode && isEditing) {
+reset({
+  name: isEditing.name,
+  description: isEditing.description,
+});
+
+} 
+else {
+   reset({
+        name: { en: "", am: "", or: "" },
+        description: { en: "", am: "", or: "" }
+      });
+      // (open: boolean) => void
+}
+
+},[isEditMode,reset, isOpen])
+
+
+  const onSubmit = async (data:any) => {
+    // console.log("submitting service data", data);
+    let response;
     try {
+if(isEditMode){
+response =await updateServices(isEditing._id,data)
+}else{
+
+   response =await createServices(data)
+  // console.log("createtion of service",response)
+}
+
+
+
+Swal.fire({
+  icon: "success",
+  title: `${isEditMode ? "Updated" : "Created"}`,
+  text: response.message || `Service is ${ isEditMode?  "Updated": "created" }successfully`,
+  confirmButtonText: "OK",
+  timer: 3000,
+  timerProgressBar: true,
+});
+
     } catch (error: any) {
       console.log("error to submit Service", error);
       const err =
@@ -112,7 +159,7 @@ export function ServiceDialog({ isOpen, setIsOpen }: props) {
                   </TabsTrigger>
                 </TabsList>
 
-                {["en", "am", "or"].map((lang) => (
+                {languages.map((lang) => (
                   <TabsContent
                     key={lang}
                     value={lang}
@@ -123,18 +170,31 @@ export function ServiceDialog({ isOpen, setIsOpen }: props) {
                         Service Name ({lang})
                       </Label>
                       <Input
+                        {...register(`name.${lang}`)}
                         className="rounded-none border-2 border-slate-200 h-12 font-bold focus-visible:border-slate-950"
                         placeholder="e.g. Bespoke Tuxedo"
                       />
+                      {errors?.name && (
+                        <p className="text-sm text-red-600">
+                          {errors?.name.message}
+                        </p>
+                      )}
                     </div>
                     <div className="space-y-2">
                       <Label className="text-[10px] font-black text-slate-950 uppercase tracking-widest">
                         Description ({lang})
                       </Label>
                       <Textarea
+                        {...register(`description.${lang}`)}
                         className="rounded-none border-2 border-slate-200 min-h-30 font-medium p-4 focus-visible:border-slate-950"
                         placeholder="Describe the craftsmanship..."
                       />
+
+                      {errors?.description && (
+                        <p className="text-sm text-red-600">
+                          {errors?.description.message}
+                        </p>
+                      )}
                     </div>
                   </TabsContent>
                 ))}

@@ -1,8 +1,63 @@
 "use client";
 import React from "react";
 import Link from "next/link";
-
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { userSchema } from "@/src/utils/libs/sanitize";
+import Swal from "sweetalert2";
+import { userRegister } from "@/src/api/userApi";
+import { useRouter } from "next/navigation";
 function Register() {
+  const {
+    register,
+    handleSubmit,
+    formState: { isSubmitting, errors },
+  } = useForm({
+    resolver: zodResolver(userSchema),
+    defaultValues: {
+      username: "",
+      email: "",
+      password: "",
+      phone: "",
+    },
+  });
+const router = useRouter()
+
+  const onSubmit=async(data:any)=>{
+    try {
+      const response = await userRegister(data);
+  console.log("register ",response)
+
+  Swal.fire({
+    icon:'success',
+    title:"Created",
+    text:response?.message||"Well come to Toxido",
+    timer:1000,
+    timerProgressBar:true,
+    confirmButtonText:"Proceed to login"
+  })
+router.push('/auth/login')
+
+    } catch (error :any) {
+      // console.log("register error", error.details);
+      const err =
+        error.response.data.message ||
+        error.message ||
+        error.response?.data?.errors?.[0] ||
+        "Failure to Register";
+      Swal.fire({
+        icon:"error",
+        title:"Register Fail",
+        text:err,
+        // confirmButtonColor:
+
+        timer:3000,
+        timerProgressBar:true
+
+      })
+    }
+  }
+
   return (
     <div className="min-h-screen bg-[#f8f5f0] flex items-center justify-center p-4 md:p-10 relative">
       {/* Texture Overlay for that premium paper feel */}
@@ -64,29 +119,25 @@ function Register() {
             </div>
           </div>
 
-          <form className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8">
-            {/* First Name */}
-            <div className="space-y-2 group">
-              <label className="text-[10px] uppercase tracking-widest text-[#1a2b3c] font-bold block group-focus-within:text-[#8e6d31] transition-colors">
-                First Name
-              </label>
-              <input
-                type="text"
-                className="w-full bg-transparent border-b border-[#1a2b3c]/10 py-2 outline-none focus:border-[#8e6d31] transition-all text-[#1a2b3c] text-sm italic"
-                placeholder="E.g. Julian"
-              />
-            </div>
-
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8"
+          >
             {/* Last Name */}
-            <div className="space-y-2 group">
+            <div className="md:col-span-2 space-y-2 group">
               <label className="text-[10px] uppercase tracking-widest text-[#1a2b3c] font-bold block group-focus-within:text-[#8e6d31] transition-colors">
-                Last Name
+                Full Name
               </label>
               <input
+                {...register("username")}
                 type="text"
                 className="w-full bg-transparent border-b border-[#1a2b3c]/10 py-2 outline-none focus:border-[#8e6d31] transition-all text-[#1a2b3c] text-sm italic"
-                placeholder="E.g. Vane"
+                placeholder="E.g. Melkias"
               />
+
+              {errors?.username && (
+                <p className="text-red-500 text-sm"> {errors?.username.message}</p>
+              )}
             </div>
 
             {/* Email - Spans full width */}
@@ -95,29 +146,54 @@ function Register() {
                 Email Address
               </label>
               <input
+                {...register("email")}
                 type="email"
                 className="w-full bg-transparent border-b border-[#1a2b3c]/10 py-2 outline-none focus:border-[#8e6d31] transition-all text-[#1a2b3c] text-sm"
                 placeholder="gentleman@toksido.com"
               />
+              {errors?.email && (
+                <p className="text-red-500 text-sm"> {errors?.email.message}</p>
+              )}
             </div>
-
+            {/* PHONE NUMBER */}
+            <div className="md:col-span-2 space-y-2 group">
+              <label className="text-[10px] uppercase tracking-widest text-[#1a2b3c] font-bold block group-focus-within:text-[#8e6d31] transition-colors">
+                Phone Number
+              </label>
+              <input
+                {...register("phone")}
+                type="text"
+                className="w-full bg-transparent border-b border-[#1a2b3c]/10 py-2 outline-none focus:border-[#8e6d31] transition-all text-[#1a2b3c] text-sm"
+                placeholder="+251 19 27 28827"
+              />
+              {errors?.phone && (
+                <p className="text-red-500 text-sm"> {errors?.phone.message}</p>
+              )}
+            </div>
             {/* Password - Spans full width */}
             <div className="md:col-span-2 space-y-2 group">
               <label className="text-[10px] uppercase tracking-widest text-[#1a2b3c] font-bold block group-focus-within:text-[#8e6d31] transition-colors">
                 Choose Password
               </label>
               <input
+                {...register("password")}
                 type="password"
                 className="w-full bg-transparent border-b border-[#1a2b3c]/10 py-2 outline-none focus:border-[#8e6d31] transition-all text-[#1a2b3c] text-sm"
                 placeholder="••••••••"
               />
+              {errors?.password && (
+                <p className="text-red-500 text-sm">
+                  {" "}
+                  {errors?.password.message}
+                </p>
+              )}
             </div>
 
             {/* Join Button */}
             <div className="md:col-span-2 pt-4">
-              <button className="group relative w-full bg-[#1a2b3c] text-[#f8f5f0] py-5 overflow-hidden transition-all shadow-xl">
+              <button className="group relative w-full bg-[#1a2b3c] text-[#f8f5f0] py-5 overflow-hidden transition-all shadow-xl cursor-pointer">
                 <span className="relative z-10 text-[11px] font-bold uppercase tracking-[0.4em]">
-                  Initialize Membership
+                  Register
                 </span>
                 <div className="absolute inset-0 bg-[#8e6d31] translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out" />
               </button>

@@ -131,7 +131,7 @@ export function SuitDialog({
         category_id: "",
         price: 0,
         image: null,
-      });
+      });(open: boolean) => void
       setPreview(null);
     }
   }, [suitToEdit, isOpen, reset]);
