@@ -31,7 +31,7 @@ return res.status(201).json({ message: "Product created successfully", product: 
     // Logic to fetch all products from the database
 try {
   
-const products = await ProudctService.getAllProducts().sort({ createdAt: -1 });
+const products = await ProudctService.getAllProducts()
 if(!products){
   return res.status(404).json({ message: "No products found" });}
   

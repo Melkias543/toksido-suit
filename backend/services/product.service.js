@@ -25,10 +25,10 @@ return result;
     },
 getAllProducts: async () => {
 try {
-  const products = await Product.find().populate('category_id');
+  const products = await Product.find().populate('category_id').sort({createdAt:-1});
   return products;
 } catch (error) {
-  console.log("Internal Server Error During fetching all products", error.message);
+  console.log("Internal Server Error During fetching all products", error);
   throw new Error("Failed to fetch products in Business Logic", error);
   
 }

@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 // Adjusted import path for suits data
 import suits from "../../../src/data/suits.js";
+import NavBar from "@/src/components/NavBar";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -26,6 +27,9 @@ const ProductDetail = () => {
 
   return (
     <div className="bg-gray-50 dark:bg-gray-900 min-h-screen text-gray-900 dark:text-gray-100 pt-32 pb-20 transition-colors duration-500">
+      <div className="bg-white dark:bg-[#0a0a0a] text-gray-900 dark:text-gray-100 transition-colors duration-500">
+        <NavBar />
+      </div>
       <div className="max-w-7xl mx-auto px-6 md:px-16">
         {/* Breadcrumb / Back Link */}
         <Link

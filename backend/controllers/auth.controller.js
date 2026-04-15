@@ -4,8 +4,37 @@ import { cookieOptions } from "../utils/cookieOptions.js";
 import { User } from "../models/user.model.js";
 import AuthService from "../services/auth.service.js";
 import { Role } from "../models/role.model.js";
-
+import dotnv from 'dotenv'
+dotnv.config()
 const AuthController = {
+   googleCallback:async (req, res) => {
+    try {
+      // Passport.js attaches the user profile returned from our Strategy to req.user
+      const user = req.user; 
+
+      if (!user) {
+        return res.status(400).json({ message: "Google Authentication failed" });
+      }
+
+      // ✅ 1. Generate token using your existing util
+      // We assume user.role_id is populated in the Passport Strategy (see step 3)
+      const token = await generateToken(user._id, user.role_id.name);
+
+      // ✅ 2. Set cookie using your existing options
+      res.cookie("token", token, cookieOptions);
+
+      // ✅ 3. Redirect back to Frontend (Since this is a GET request from a browser redirect)
+      // You cannot send a JSON response here because the browser is in a redirect flow.
+      res.redirect(process.env.FRONTEND_URL);
+
+    } catch (error) {
+      console.log("❌ Google Auth Controller Error:", error.message);
+      res.redirect("http://localhost:3000/login?error=auth_failed");
+      
+    }
+  },
+
+
 
   register: async (req, res) => {
     try {
@@ -67,9 +96,15 @@ const userData = {
         return res.status(400).json({ message: "Invalid credentials" });
       }
 
-      // ✅ Generate token HERE
-      const token = generateToken(user._id,user.role_id);
 
+
+      
+      
+      // ✅ Generate token HERE
+      const token = await generateToken(user._id,user.role_id.name);
+
+
+      console.log("user and pass matched:",user,'token:' ,token)
       // ✅ Set cookie
       res.cookie("token", token, cookieOptions);
 
@@ -79,6 +114,7 @@ const userData = {
           id: user._id,
           email: user.email,
           username: user.username,
+          role: user.role_id.name,
         },
       });
 

@@ -1,13 +1,14 @@
+import NavBar from "@/src/components/NavBar";
 import ProductCard from "@/src/components/ProductCard";
 import suits from "@/src/data/suits";
 
 const LandingPage = () => {
   return (
     <>
-      <ProductCard suits={suits}
-      isAdmin={false}
-      
-      />;
+      <div className="bg-white dark:bg-[#0a0a0a] text-gray-900 dark:text-gray-100 transition-colors duration-500">
+        <NavBar />
+      </div>
+      <ProductCard suits={suits} isAdmin={false} />;
       <section className="py-24 bg-gray-800 text-white text-center relative overflow-hidden">
         {/* Decorative background element */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-yellow-400 opacity-[0.03] rounded-full -mr-32 -mt-32"></div>
@@ -32,6 +33,6 @@ const LandingPage = () => {
       </footer>
     </>
   );
-}
+};
 
 export default LandingPage;
