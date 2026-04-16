@@ -45,15 +45,16 @@ function Login() {
         // window.location.href='/dashboard'
       });
     } catch (error: any) {
-      console.log("error of login", error);
+      // console.log("error of login", error);
       const err =
         error.response.data.message ||
+        error.response.data ||
         error.message ||
         error.response?.data?.errors?.[0] ||
         "Failure to Register";
       Swal.fire({
         icon: "error",
-        title: "Register Fail",
+        title: "Log in Fail",
         text: err,
         // confirmButtonColor:
 

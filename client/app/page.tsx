@@ -1,3 +1,4 @@
+"use client";
 import Contact from "@/src/components/Contact";
 import HeroPage from "@/src/components/HeroPage";
 import NavBar from "@/src/components/NavBar";

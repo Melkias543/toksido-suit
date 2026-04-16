@@ -1,44 +1,43 @@
+
 import axios from "axios";
+import { toast } from "sonner";
 
 const apiClient = axios.create({
-  // Use environment variables for production vs development
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
-    withCredentials: true, // Essential to send cookies (Refresh Token)
-  headers: {
-    "Content-Type": "application/json",
-  },
+  baseURL: "http://localhost:8000/api",
+  withCredentials: true,
 });
-
 
 apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
-    // If error is 401 (Unauthorized) and we haven't tried to refresh yet
+    // Rate Limiting Check
+    if (error.response?.status === 429) {
+      toast.error("Too many requests. Please slow down.");
+      return Promise.reject(error);
+    }
+
+    // 401 Unauthorized - Token likely expired
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {
-        /**
-         * Call the refresh-token endpoint.
-         * Your Express server should check the 'refreshToken' cookie here
-         * and set a new 'accessToken' cookie in the response.
-         */
-        await apiClient.post("/refresh-token");
+        // Use a standard axios call here to avoid interceptor recursion
+        await axios.post(
+          "http://localhost:8000/api/auth/refresh",
+          {},
+          { withCredentials: true },
+        );
 
-        /**
-         * After a successful refresh, the browser now has the new cookie.
-         * We retry the original failed request.
-         * Axios will automatically include the new cookie this time.
-         */
+        // Retry the original request with the new cookie
         return apiClient(originalRequest);
       } catch (refreshError) {
-        /**
-         * If the refresh-token call fails (e.g., refresh token is also expired),
-         * we force the user to the login page.
-         */
+        console.error("Refresh failed:", refreshError);
+
+        // ONLY redirect if the refresh call itself failed
         if (typeof window !== "undefined") {
+          // Optional: Only redirect if it's a 403 or 401 from the refresh call
           window.location.href = "/auth/login";
         }
         return Promise.reject(refreshError);
@@ -48,6 +47,5 @@ apiClient.interceptors.response.use(
     return Promise.reject(error);
   },
 );
-
 
 export default apiClient;

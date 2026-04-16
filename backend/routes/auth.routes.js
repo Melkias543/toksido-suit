@@ -49,4 +49,7 @@ authRoutes.post("/logout", (req, res) => {
   res.status(200).json({ message: "Logged out" });
 });
 
+
+
+authRoutes.post("/refresh", AuthController.GenerateRefreshToken );
 export default authRoutes

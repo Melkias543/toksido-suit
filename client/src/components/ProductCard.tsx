@@ -26,7 +26,7 @@ import Cookies from "js-cookie";
 import NotFondPage from "./NotFondPage";
 import { SuitDialog } from "./AddNewSuitDialog";
 import Swal from "sweetalert2";
-import { getCategory } from "../api/userApi";
+import { favoriteIt, getCategory } from "../api/userApi";
 type Lang = "en" | "am" | "or";
 
 function ProductCard({ suits, isAdmin }: ProductCardProps) {
@@ -38,7 +38,7 @@ function ProductCard({ suits, isAdmin }: ProductCardProps) {
   const [liked , setLiked]= useState()
 
 
-  console.log('category',category)
+  // console.log('category',category)
 
   const locale = (Cookies.get("NEXT_LOCALE") as Lang) || "en";
 if (!category) {
@@ -131,6 +131,37 @@ setCategory(response.categories);
       });
     }
   };
+
+
+const makeFavourite=async()=>{
+try {
+  
+const response = await favoriteIt()
+console.log("FAVORITE",response)
+
+
+} catch (error:any) {
+  console.log(error)
+  const err =
+          error.response.data.message ||
+          error.response.data ||
+          error.message ||
+          error.response?.data?.errors?.[0] ||
+          "Failure to Register";
+        Swal.fire({
+          icon: "error",
+          title: "Log in Fail",
+          text: err,
+          // confirmButtonColor:
+  
+          timer: 3000,
+          timerProgressBar: true,
+        });
+      
+}
+}  
+
+
   return (
     <div className="bg-gray-50 dark:bg-gray-900 min-h-screen text-gray-900 dark:text-gray-100 transition-colors duration-500">
       {/* --- CATEGORY GRID SECTION --- */}
@@ -276,7 +307,7 @@ setCategory(response.categories);
                       </CardFooter>
                     ) : (
                       <Button 
-                      
+                      onClick={makeFavourite}
                       className="bg-yellow-800 dark:bg-gray-100 dark:text-gray-900  text-white px-6 py-2.5 rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-yellow-700  hover:text-gray-900 transition-all ">
                         Favorite
                       </Button>

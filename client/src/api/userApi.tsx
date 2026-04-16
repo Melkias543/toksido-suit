@@ -32,3 +32,11 @@ export const getCategory=async()=>{
        }
 }
 
+export const favoriteIt=async()=>
+    {
+        try {
+            
+        } catch (error) {
+            
+        }
+    }

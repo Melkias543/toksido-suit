@@ -16,24 +16,21 @@ export const generateToken = async(userId, role) => {
   return accessToken;
 };
 
-export const refreshToken = async(req, res) => {
+export const refreshToken = async(userId, role) => {
   // 1. Get token from cookies (requires cookie-parser middleware)
-  const token = req.cookies.refreshToken;
-
-  if (!token) {
-    return res.status(401).json({ message: "Refresh Token not found" });
+  try {
+   if (!process.env.REFRESH_SECRET) {
+    throw new Error("JWT_SECRET is missing from environment variables");
   }
 
-  try {
-    // 2. Verify the Refresh Token
-    const decoded = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
+    const refreshToken = jwt.sign(
+      { id: userId, role: role },
+      process.env.REFRESH_SECRET,
+      { expiresIn: "7d" } // 7 days
+    );
 
-    // 3. Generate a new Access Token
-    // Note: In a production app, you'd usually fetch the user from the DB 
-    // here to ensure the account is still active/get their current role.
-    const accessToken = generateToken(decoded.id, decoded.role);
 
-    res.status(200).json({ accessToken });
+    return refreshToken;
   } catch (error) {
     return res.status(403).json({ message: "Invalid or expired refresh token" });
   }
