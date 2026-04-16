@@ -87,7 +87,7 @@ return response.data
 
 export const updateServices = async (data:any, id:String) => {
   try {
-
+console.log("data and id", data, id)
     const response = await apiClient.put(`/service/${id}`, data);
 return response.data
   } catch (error) {

@@ -26,23 +26,53 @@ import Cookies from "js-cookie";
 import NotFondPage from "./NotFondPage";
 import { SuitDialog } from "./AddNewSuitDialog";
 import Swal from "sweetalert2";
+import { getCategory } from "../api/userApi";
 type Lang = "en" | "am" | "or";
 
 function ProductCard({ suits, isAdmin }: ProductCardProps) {
   // Dummy category data using colors as placeholders to avoid Next.js Image errors
   const [suitsData, setSuitsData] = useState([]);
   const [editSuit, setEditSuit] = useState(false);
-  const [suitToBeEdited, setSuitToBeEdited] = useState({});
-  const categories = [
-    { id: 1, name: "Wedding", color: "bg-blue-900", count: "12 Styles" },
-    { id: 2, name: "Business", color: "bg-gray-800", count: "18 Styles" },
-    { id: 3, name: "Casual", color: "bg-amber-900", count: "9 Styles" },
-    { id: 4, name: "Bespoke", color: "bg-zinc-900", count: "5 Styles" },
-  ];
+  const [suitToBeEdited, setSuitToBeEdited] = useState(null);
+  const [category, setCategory] = useState([])
+  const [liked , setLiked]= useState()
+
+
+  console.log('category',category)
+
+  const locale = (Cookies.get("NEXT_LOCALE") as Lang) || "en";
+if (!category) {
+  return <div>Loading categories...</div>;
+}
+const categories = category.map((category: any, index) => ({
+  id: category._id, // Use the database ID
+  name:
+    category.name[locale] ||
+    category.name.en ||
+    category.name.or ||
+    category.name.am, // Use the full name (e.g., "Wedding")
+  // Cycle through your specific colors based on the index
+  color: ["bg-blue-900", "bg-gray-800", "bg-amber-900", "bg-zinc-900"][
+    index % 4
+  ],
+  count: "12 Styles", // You can hardcode this or use a real field if available
+}));
 
   useEffect(() => {
     getALlSuits();
+    getALLCategory()
   }, []);
+const getALLCategory =async()=>{
+try {
+  const response = await getCategory()
+  // console.log(response)
+setCategory(response.categories);
+
+} catch (error) {
+  console.log(error)
+}
+}
+
 
   const getALlSuits = async () => {
     try {
@@ -58,7 +88,6 @@ function ProductCard({ suits, isAdmin }: ProductCardProps) {
     }
   };
 
-  const locale = (Cookies.get("NEXT_LOCALE") as Lang) || "en";
 
   const handleDelete = async (id: string) => {
     // 🔹 Confirmation dialog
@@ -246,9 +275,11 @@ function ProductCard({ suits, isAdmin }: ProductCardProps) {
                         </DropdownMenu>
                       </CardFooter>
                     ) : (
-                      <button className="bg-gray-900 dark:bg-gray-100 dark:text-gray-900 text-white px-6 py-2.5 rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-yellow-400 hover:text-gray-900 transition-all">
-                        Make Your Favorite
-                      </button>
+                      <Button 
+                      
+                      className="bg-yellow-800 dark:bg-gray-100 dark:text-gray-900  text-white px-6 py-2.5 rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-yellow-700  hover:text-gray-900 transition-all ">
+                        Favorite
+                      </Button>
                     )}
                   </div>
                 </div>

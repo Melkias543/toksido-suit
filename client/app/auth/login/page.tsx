@@ -26,7 +26,7 @@ function Login() {
   const onSubmit = async (data: any) => {
     try {
       const respone = await userLogin(data);
-      console.log("response of login", respone);
+      // console.log("response of login", respone);
       Swal.fire({
         icon: "success",
         title: "Login Success",
@@ -34,11 +34,13 @@ function Login() {
         timer: 3000,
         timerProgressBar: true,
       }).then(() => {
-        if (respone.user.role !== "admin") {
+        if (respone.user.role == "admin") {
           router.push("/admin/dashboard");
+        }else{
+          router.push("/");
+
         }
 
-        router.push("/");
 
         // window.location.href='/dashboard'
       });

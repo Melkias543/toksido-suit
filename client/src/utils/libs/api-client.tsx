@@ -9,59 +9,45 @@ const apiClient = axios.create({
   },
 });
 
-// GLOBAL INTERCEPTORS (The real "Global Config" power)
 
-// const api = axios.create({
-//   baseURL: "http://localhost:5000/api", // Your API base URL
-//   withCredentials: true, // Essential to send cookies (Refresh Token)
-// });
+apiClient.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
 
-// // REQUEST INTERCEPTOR: Attach Access Token to every request if it exists
-// api.interceptors.request.use(
-//   (config) => {
-//     const token = localStorage.getItem("accessToken"); // Or your preferred state store
-//     if (token) {
-//       config.headers.Authorization = `Bearer ${token}`;
-//     }
-//     return config;
-//   },
-//   (error) => Promise.reject(error),
-// );
+    // If error is 401 (Unauthorized) and we haven't tried to refresh yet
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
 
-// // RESPONSE INTERCEPTOR: Handle 401 (Expired) errors
-// api.interceptors.response.use(
-//   (response) => response, // Pass through successful responses
-//   async (error) => {
-//     const originalRequest = error.config;
+      try {
+        /**
+         * Call the refresh-token endpoint.
+         * Your Express server should check the 'refreshToken' cookie here
+         * and set a new 'accessToken' cookie in the response.
+         */
+        await apiClient.post("/refresh-token");
 
-//     // If error is 401 and we haven't tried refreshing yet
-//     if (error.response?.status === 401 && !originalRequest._retry) {
-//       originalRequest._retry = true;
+        /**
+         * After a successful refresh, the browser now has the new cookie.
+         * We retry the original failed request.
+         * Axios will automatically include the new cookie this time.
+         */
+        return apiClient(originalRequest);
+      } catch (refreshError) {
+        /**
+         * If the refresh-token call fails (e.g., refresh token is also expired),
+         * we force the user to the login page.
+         */
+        if (typeof window !== "undefined") {
+          window.location.href = "/auth/login";
+        }
+        return Promise.reject(refreshError);
+      }
+    }
 
-//       try {
-//         // Call your refresh token endpoint
-//         const resp = await axios.post(
-//           "http://localhost:5000/api/refresh-token",
-//           {},
-//           { withCredentials: true },
-//         );
-
-//         const { accessToken } = resp.data;
-//         localStorage.setItem("accessToken", accessToken);
-
-//         // Update the failed request with the new token and retry
-//         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-//         return api(originalRequest);
-//       } catch (refreshError) {
-//         // Refresh token failed/expired -> Force Logout
-//         localStorage.removeItem("accessToken");
-//         window.location.href = "/login";
-//         return Promise.reject(refreshError);
-//       }
-//     }
-//     return Promise.reject(error);
-//   },
-// );
+    return Promise.reject(error);
+  },
+);
 
 
 export default apiClient;
