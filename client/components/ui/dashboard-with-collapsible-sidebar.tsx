@@ -158,7 +158,7 @@ const CentralDashboard = ({ isDark, setIsDark }: Props) => {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-3xl p-6 text-white shadow-lg shadow-blue-500/20">
+          <div className="bg-linear-to-br from-blue-600 to-blue-700 rounded-3xl p-6 text-white shadow-lg shadow-blue-500/20">
             <div className="flex justify-between items-start mb-4">
               <div className="p-2 bg-white/20 rounded-lg backdrop-blur-md">
                 <TrendingUp size={20} />

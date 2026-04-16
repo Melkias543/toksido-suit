@@ -33,6 +33,7 @@ const isEditMode =!!isEditing
   const {
     register,
     reset,
+    
     formState: { errors, isSubmitting },
     handleSubmit,
   } = useForm({
@@ -95,6 +96,7 @@ Swal.fire({
   timerProgressBar: true,
 });
 
+setIsOpen(false)
     } catch (error: any) {
       console.log("error to submit Service", error);
       const err =

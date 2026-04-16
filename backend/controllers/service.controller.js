@@ -119,7 +119,7 @@ export const ServiceController = {
     try {
       const { id } = req.params;
       const { name, description } = req.body;
-
+console.log(id)
       // ✅ ID validation
       if (!id || !mongoose.isValidObjectId(id)) {
         return res.status(400).json({

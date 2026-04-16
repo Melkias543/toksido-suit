@@ -1,4 +1,5 @@
 import CategoryService from "../services/category.service.js";
+import * as mongo from 'mongodb';
 
 
  const CategoryController = {  
@@ -53,7 +54,16 @@ try {
 
 
 },
-editCategory: (req, res) => {},
+editCategory: (req, res) => {
+  const { id } = req.params;
+  if(!mongo.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ message: "Invalid category ID" })
+
+  }
+  const { name} = req.body;
+
+
+},
 deleteCategory: (req, res) => {},
   }
 

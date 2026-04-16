@@ -19,3 +19,16 @@ export const userLogin =async(data:any)=>{
      throw error
     }
 }
+
+
+
+
+export const getCategory=async()=>{
+    try {
+        const response =await apiClient.get('/categories/get-all')
+        return response.data
+       } catch (error) {
+        throw error
+       }
+}
+

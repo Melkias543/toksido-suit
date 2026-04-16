@@ -15,9 +15,10 @@ app.use(passport.initialize());
 app.use(cors({
   origin: "http://localhost:3000", // your Frontend's URL
   methods: ["GET", "POST", "PUT","PATCH", "DELETE"],
-  credentials: true
+  credentials: true,
 }));
-app.use(express.json());
+app.use(cookieParser());
+// app.use(express.json());
 app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" }
 }));

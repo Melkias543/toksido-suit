@@ -6,14 +6,20 @@ const productRouter = express.Router();
 import {upload} from "../utils/ multerConfig.js";
 import multer from "multer";
 import multerMiddleware from "../middlewares/multer.midlware.js";
+import { authMiddleware, authorize } from "../middlewares/auth.midlware.js";
 
 // productRouter.get("/", (req, res) => {
 //   res.send("Product route");
 // });
-productRouter.post("/create",multerMiddleware, validate(productSchemaValidator), ProductController.createProduct);
+
+// ADMIN PAGE ONLY
+productRouter.post("/create" ,authMiddleware , authorize('admin'),multerMiddleware, validate(productSchemaValidator), ProductController.createProduct);
+productRouter.put('/:id',authMiddleware , authorize('admin'),multerMiddleware, validate(productSchemaValidator),   ProductController.updateProduct);
+productRouter.delete('/:id',authMiddleware , authorize('admin'),ProductController.deleteProduct);
+
+
+
 productRouter.get('/products/:id',ProductController.getProductById);
-productRouter.put('/:id',multerMiddleware, validate(productSchemaValidator),   ProductController.updateProduct);
-productRouter.delete('/:id' ,ProductController.deleteProduct);
 productRouter.get("/get-all", ProductController.getAllProducts);
 
 export default productRouter;

@@ -1,14 +1,38 @@
 "use client";
 import { Sidebar } from "@/components/ui/modern-side-bar";
 import NavBar from "@/src/components/NavBar";
+import apiClient from "@/src/utils/libs/api-client";
 import { Globe, Languages, LanguagesIcon } from "lucide-react";
-import React from "react";
+import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+
+const [loading, setLoading] = useState(true);
+const router = useRouter();
+
+useEffect(() => {
+  const checkAuth = async () => {
+    try {
+      // This endpoint should use authMiddleware and authorize('admin')
+      await apiClient.get("/auth/verify-admin");
+      setLoading(false);
+    } catch (err) {
+      // If 401 (No token) or 403 (Not admin), send to login
+      router.push("/auth/login");
+    }
+  };
+
+  checkAuth();
+}, [router]);
+
+if (loading) return <div>Loading Admin Panel...</div>;
+
+
   return (
     // Changed max-h-screen to min-h-screen for better stability
     <div className="flex min-h-screen bg-gray-50 dark:bg-gray-950">
