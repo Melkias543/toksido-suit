@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   description:
     "Defining menswear through precision, heritage, and contemporary design since 2026.",
   icons: {
-    icon: "/favicon.ico", // Ensure you have a favicon in /public
+    icon: "/logo.png", // Ensure you have a favicon in /public
   },
 };
 

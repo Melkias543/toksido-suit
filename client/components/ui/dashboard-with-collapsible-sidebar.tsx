@@ -27,7 +27,7 @@ const CentralDashboard = ({ isDark, setIsDark }: Props) => {
         <div>
           <h1 className="text-3xl font-black text-gray-900 dark:text-gray-100 tracking-tight">
             Dashboard{" "}
-            <span className="text-blue-600 dark:text-blue-500">Overview</span>
+            <span className="text-blue-600 dark:text-blue-500">Admin Dashboard</span>
           </h1>
           <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">
             Real-time analytics and system status for your store.

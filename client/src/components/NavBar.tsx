@@ -1,8 +1,12 @@
+// "use client";
+
 import React from "react";
 import LocaleSwitcher from "./LocaleSwitcher";
 import Link from "next/link";
+import apiClient from "../utils/libs/api-client";
 
 function NavBar() {
+
   return (
     <div>
       {" "}
@@ -34,6 +38,7 @@ function NavBar() {
           >
             Log In
           </Link>
+
         </div>
       </nav>
     </div>
@@ -41,4 +46,3 @@ function NavBar() {
 }
 
 export default NavBar;
-

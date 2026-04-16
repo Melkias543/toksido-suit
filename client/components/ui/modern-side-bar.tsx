@@ -17,6 +17,8 @@ import {
 } from "lucide-react";
 import AdminAllInOne from "@/src/components/admin";
 import Link from "next/link";
+import Image from "next/image";
+import apiClient from "@/src/utils/libs/api-client";
 
 interface NavigationItem {
   id: string;
@@ -92,8 +94,18 @@ export  function Sidebar({ className = "" }: SidebarProps) {
   const toggleSidebar = () => setIsOpen(!isOpen);
   const toggleCollapse = () => setIsCollapsed(!isCollapsed);
 
-  const handleItemClick = (itemId: string) => {
+  const handleItemClick = async(itemId: string) => {
     setActiveItem(itemId);
+
+
+    const response =await apiClient.post('/auth/logout')
+    // console.log(response)
+      if(response.status===200){
+        window.location.href='/auth/login'
+
+      }
+    
+
     if (window.innerWidth < 768) {
       setIsOpen(false);
     }
@@ -135,16 +147,51 @@ export  function Sidebar({ className = "" }: SidebarProps) {
         {/* Header with logo and collapse button */}
         <div className="flex items-center justify-between p-5 border-b border-slate-200 bg-slate-50/60">
           {!isCollapsed && (
-            <div className="flex items-center space-x-2.5">
-              <div className="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center shadow-sm">
-                <span className="text-white font-bold text-base">A</span>
+            // <div className="flex items-center space-x-2.5">
+            //   <div className="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center shadow-sm">
+            //     <Link href="/admin/dashboard">
+            //       <Image
+            //         src="/logo.png" // Path to your logo in /public
+            //         alt="Toksid Logo"
+            //         width={150}
+            //         height={50}
+            //         // className="object-none"
+            //         priority // Tells Next.js to load this immediately (good for logos)
+            //       />
+            //     </Link>{" "}
+            //   </div>
+            //   <div className="flex flex-col">
+            //     <span className="font-semibold text-slate-800 text-base">
+            //       TOKSIDO{" "}
+            //     </span>
+            //     <span className="text-xs text-slate-500">
+            //       Toksido Dashboard
+            //     </span>
+            //   </div>
+            // </div>
+
+            <div className="flex items-center space-x-3">
+              {/* 1. Removed fixed w-9 h-9 and bg-blue-600 to let the logo breathe */}
+              <div className="flex-shrink-0">
+                <Link href="/admin/dashboard">
+                  <Image
+                    src="/icon.png"
+                    alt="Toksido Logo"
+                    width={40} // Adjust this to the size you actually want the icon to be
+                    height={40} // Adjust this to match
+                    priority
+                    className="object-contain"
+                  />
+                </Link>
               </div>
+
+              {/* 2. Text column stays as is */}
               <div className="flex flex-col">
-                <span className="font-semibold text-slate-800 text-base">
-                  Acme Corp
+                <span className="font-bold text-slate-800 text-base tracking-tight">
+                  TOKSIDO
                 </span>
-                <span className="text-xs text-slate-500">
-                  Enterprise Dashboard
+                <span className="text-[10px] uppercase font-medium text-slate-400">
+                  Dashboard
                 </span>
               </div>
             </div>
@@ -317,7 +364,7 @@ export  function Sidebar({ className = "" }: SidebarProps) {
               onClick={() => handleItemClick("logout")}
               className={`
                 w-full flex items-center rounded-md text-left transition-all duration-200 group
-                text-red-600 hover:bg-red-50 hover:text-red-700
+                text-red-600 hover:bg-red-50 hover:text-red-700 cursor-pointer
                 ${isCollapsed ? "justify-center p-2.5" : "space-x-2.5 px-3 py-2.5"}
               `}
               title={isCollapsed ? "Logout" : undefined}
