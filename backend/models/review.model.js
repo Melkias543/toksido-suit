@@ -5,7 +5,7 @@ const reviewSchema = new mongo.Schema({
     type: mongo.Schema.Types.ObjectId,
     ref: 'User'
   },
-  product_id: {
+  suit_id: {
     type: mongo.Schema.Types.ObjectId,
     ref: 'Product'
   },
@@ -16,6 +16,6 @@ const reviewSchema = new mongo.Schema({
   },
   comment: String
 }, { timestamps: true })
-
+reviewSchema.index({ user_id: 1, suit_id: 1 }, { unique: true });
 export const Review = mongo.model('Review', reviewSchema)
 

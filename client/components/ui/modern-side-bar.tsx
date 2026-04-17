@@ -19,6 +19,7 @@ import AdminAllInOne from "@/src/components/admin";
 import Link from "next/link";
 import Image from "next/image";
 import apiClient from "@/src/utils/libs/api-client";
+import { useAuth } from "@/src/context/authContext";
 
 interface NavigationItem {
   id: string;
@@ -96,10 +97,12 @@ export  function Sidebar({ className = "" }: SidebarProps) {
 
   const handleItemClick = async(itemId: string) => {
     setActiveItem(itemId);
-
+const {logout}= useAuth()
 
     const response =await apiClient.post('/auth/logout')
     // console.log(response)
+
+          logout()
       if(response.status===200){
         window.location.href='/auth/login'
 
