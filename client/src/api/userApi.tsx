@@ -32,11 +32,20 @@ export const getCategory=async()=>{
        }
 }
 
-export const favoriteIt=async()=>
-    {
-        try {
-            
-        } catch (error) {
-            
-        }
-    }
+export const favoriteIt = async (rating: any) => {
+  // Check if we have both values
+  console.log(rating)
+  if (!rating.suit_id || !rating.rating) return;
+
+  try {
+    
+    const response = await apiClient.patch(
+      `/rate-suit/${rating.suit_id}`,
+      { rating: rating.rating }, // Pass as an object, not a raw number
+    );
+
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

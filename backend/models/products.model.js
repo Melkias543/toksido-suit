@@ -33,7 +33,22 @@ const productSchema = new mongoose.Schema({
   image: {
     type: String,
     required: true 
+  },
+   ratingStats: {
+      average: { 
+      type: Number, 
+      default: 0,
+      min: 0,
+      max: 5,
+      // Rounds the average to 1 decimal place (e.g., 4.7)
+      set: v => Math.round(v * 10) / 10 
+    },
+    total: { 
+      type: Number, 
+      default: 0 
+    }
   }
+
 }, { timestamps: true });
 
 // Indexing remains the same

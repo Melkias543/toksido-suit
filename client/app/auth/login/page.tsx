@@ -8,6 +8,7 @@ import Swal from "sweetalert2";
 import { userLogin } from "@/src/api/userApi";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/src/context/authContext";
 
 function Login() {
   const {
@@ -22,7 +23,7 @@ function Login() {
     },
   });
   const router = useRouter();
-
+const {login}= useAuth()
   const onSubmit = async (data: any) => {
     try {
       const respone = await userLogin(data);
@@ -34,6 +35,8 @@ function Login() {
         timer: 3000,
         timerProgressBar: true,
       }).then(() => {
+
+         login(respone.user)
         if (respone.user.role == "admin") {
           router.push("/admin/dashboard");
         }else{

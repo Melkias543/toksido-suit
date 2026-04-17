@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getLocale, setRequestLocale } from "next-intl/server";
 import "./globals.css";
+import { AuthProvider } from "@/src/context/authContext";
 
 // Configure Fonts
 const geistSans = Geist({
@@ -47,9 +48,14 @@ export default async function RootLayout({
         {/* NextIntlClientProvider allows 'use client' components 
             to use the useTranslations() hook.
         */}
+
+      <AuthProvider>
+
         <NextIntlClientProvider messages={messages} locale={locale}>
           {children}
         </NextIntlClientProvider>
+
+      </AuthProvider>
       </body>
     </html>
   );

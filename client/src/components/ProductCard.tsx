@@ -9,15 +9,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-import suits from "@/src/data/suits";
+import { Star } from "lucide-react"; // Elegant for a luxury brand
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AnyARecord } from "dns";
-import {
-  deleteProduct,
-  getAllProducts,
-} from "../api/AdminApi";
+import { deleteProduct, getAllProducts } from "../api/AdminApi";
 interface ProductCardProps {
   suits: any; // Ideally, define a proper interface for your suit
   isAdmin: boolean;
@@ -27,6 +23,7 @@ import NotFondPage from "./NotFondPage";
 import { SuitDialog } from "./AddNewSuitDialog";
 import Swal from "sweetalert2";
 import { favoriteIt, getCategory } from "../api/userApi";
+import { useAuth } from "../context/authContext";
 type Lang = "en" | "am" | "or";
 
 function ProductCard({ suits, isAdmin }: ProductCardProps) {
@@ -34,51 +31,48 @@ function ProductCard({ suits, isAdmin }: ProductCardProps) {
   const [suitsData, setSuitsData] = useState([]);
   const [editSuit, setEditSuit] = useState(false);
   const [suitToBeEdited, setSuitToBeEdited] = useState(null);
-  const [category, setCategory] = useState([])
-  const [liked , setLiked]= useState()
-
+  const [category, setCategory] = useState([]);
+  console.log("Fetched suits:", suitsData); // Assuming the API response has a 'products' field
 
   // console.log('category',category)
 
   const locale = (Cookies.get("NEXT_LOCALE") as Lang) || "en";
-if (!category) {
-  return <div>Loading categories...</div>;
-}
-const categories = category.map((category: any, index) => ({
-  id: category._id, // Use the database ID
-  name:
-    category.name[locale] ||
-    category.name.en ||
-    category.name.or ||
-    category.name.am, // Use the full name (e.g., "Wedding")
-  // Cycle through your specific colors based on the index
-  color: ["bg-blue-900", "bg-gray-800", "bg-amber-900", "bg-zinc-900"][
-    index % 4
-  ],
-  count: "12 Styles", // You can hardcode this or use a real field if available
-}));
+  if (!category) {
+    return <div>Loading categories...</div>;
+  }
+  const categories = category.map((category: any, index) => ({
+    id: category._id, // Use the database ID
+    name:
+      category.name[locale] ||
+      category.name.en ||
+      category.name.or ||
+      category.name.am, // Use the full name (e.g., "Wedding")
+    // Cycle through your specific colors based on the index
+    color: ["bg-blue-900", "bg-gray-800", "bg-amber-900", "bg-zinc-900"][
+      index % 4
+    ],
+    count: "12 Styles", // You can hardcode this or use a real field if available
+  }));
 
   useEffect(() => {
     getALlSuits();
-    getALLCategory()
+    getALLCategory();
   }, []);
-const getALLCategory =async()=>{
-try {
-  const response = await getCategory()
-  // console.log(response)
-setCategory(response.categories);
-
-} catch (error) {
-  console.log(error)
-}
-}
-
+  const getALLCategory = async () => {
+    try {
+      const response = await getCategory();
+      // console.log(response)
+      setCategory(response.categories);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const getALlSuits = async () => {
     try {
       const response = await getAllProducts();
       // console.log("Products fetched successfully:", response);
-      setSuitsData(response.products); // Assuming the API response has a 'products' field
+      setSuitsData(response.products);
     } catch (error: any) {
       const errorDate =
         error.response?.data ||
@@ -88,10 +82,9 @@ setCategory(response.categories);
     }
   };
 
-
   const handleDelete = async (id: string) => {
     // 🔹 Confirmation dialog
-    console.log("Id to be deleted",id)
+    console.log("Id to be deleted", id);
     const result = await Swal.fire({
       title: "Are you sure?",
       text: "This action cannot be undone!",
@@ -132,35 +125,49 @@ setCategory(response.categories);
     }
   };
 
+  const [ratings, setRatings] = useState<Record<string, number>>({});
+  const [hovered, setHovered] = useState<Record<string, number>>({});
 
-const makeFavourite=async()=>{
-try {
-  
-const response = await favoriteIt()
-console.log("FAVORITE",response)
+  const { user, isLoggedIn } = useAuth();
 
+ 
+  const handleRate = async (suitId: string, value: number) => {
+    // 1. Auth Check
+    if (!user || !isLoggedIn) {
+      Swal.fire({
+        title: "Login Required",
+        text: "You need to be logged in to rate our collection.",
+        icon: "info",
+        showCancelButton: true,
+        confirmButtonColor: "#b45309",
+        confirmButtonText: "Login Now",
+        cancelButtonText: "Maybe Later",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          window.location.href = "/auth/login";
+        }
+      });
+      return;
+    }
 
-} catch (error:any) {
-  console.log(error)
-  const err =
-          error.response.data.message ||
-          error.response.data ||
-          error.message ||
-          error.response?.data?.errors?.[0] ||
-          "Failure to Register";
-        Swal.fire({
-          icon: "error",
-          title: "Log in Fail",
-          text: err,
-          // confirmButtonColor:
-  
-          timer: 3000,
-          timerProgressBar: true,
-        });
-      
-}
-}  
+    // 2. Update the UI state (Optimistic Update)
+    setRatings((prev) => ({
+      ...prev,
+      [suitId]: value,
+    }));
 
+    try {
+      // 3. IMPORTANT: Send the direct variables (suitId and value)
+      // instead of the 'ratings' state object.
+      // console.log("Sending to API:", { id: suitId, rate: value });
+
+      const response = await favoriteIt({ suit_id: suitId, rating: value });
+
+      // console.log("Rating submitted successfully:", response);
+    } catch (error) {
+      console.error("Error sending rating:", error);
+    }
+  };
 
   return (
     <div className="bg-gray-50 dark:bg-gray-900 min-h-screen text-gray-900 dark:text-gray-100 transition-colors duration-500">
@@ -239,8 +246,41 @@ console.log("FAVORITE",response)
                     <h3 className="text-xl font-bold">
                       {suit.name[locale] || suit.name["en"]}
                     </h3>
-                    <div className="flex items-center text-yellow-400 text-sm font-bold bg-yellow-400/10 px-2 py-1 rounded">
-                      {suit?.rating || "N/A"} <span className="ml-1">★</span>
+                    {/* <div className="flex items-center text-yellow-400 text-sm font-bold bg-yellow-400/10 px-2 py-1 rounded">
+                      {suit?.ratingStats.average || "N/A"}{" "}
+                      <span className="ml-1">★</span>
+                    </div> */}
+
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-center gap-0.5">
+                        {[1, 2, 3, 4, 5].map((starIndex) => (
+                          <Star
+                            key={starIndex}
+                            size={14}
+                            // Fill the star if the average rating is >= this star's position
+                            fill={
+                              (suit?.ratingStats?.average || 0) >= starIndex
+                                ? "currentColor"
+                                : "none"
+                            }
+                            className={`${
+                              (suit?.ratingStats?.average || 0) >= starIndex
+                                ? "text-yellow-500" // Filled color
+                                : "text-gray-300 dark:text-gray-600" // Empty color
+                            }`}
+                          />
+                        ))}
+
+                        {/* Optional: Show the number next to the stars */}
+                        <span className="ml-2 text-xs font-bold text-gray-600 dark:text-gray-400">
+                          {suit?.ratingStats?.average || "0.0"}
+                        </span>
+                      </div>
+
+                      {/* Total Reviews Count */}
+                      <p className="text-[10px] text-gray-400 uppercase tracking-widest">
+                        {suit?.ratingStats?.total || 0} 
+                      </p>
                     </div>
                   </div>
 
@@ -306,11 +346,76 @@ console.log("FAVORITE",response)
                         </DropdownMenu>
                       </CardFooter>
                     ) : (
-                      <Button 
-                      onClick={makeFavourite}
-                      className="bg-yellow-800 dark:bg-gray-100 dark:text-gray-900  text-white px-6 py-2.5 rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-yellow-700  hover:text-gray-900 transition-all ">
-                        Favorite
-                      </Button>
+                      // <Button
+                      // onClick={rateThisSuit}
+                      // className="bg-yellow-800 dark:bg-gray-100 dark:text-gray-900  text-white px-6 py-2.5 rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-yellow-700  hover:text-gray-900 transition-all ">
+                      //   *****
+                      // </Button>
+
+                      // <div className="flex flex-col gap-2">
+                      //   <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-gray-400">
+                      //     Rate this Suit
+                      //   </span>
+
+                      //   <div className="flex items-center gap-1">
+                      //     {[1, 2, 3, 4, 5].map((index) => (
+                      //       <Star
+                      //         key={index}
+                      //         size={22}
+                      //         // Logic: Fill star if its index is <= the hovered star OR the selected rating
+                      //         fill={
+                      //           (hover || rating) >= index
+                      //             ? "currentColor"
+                      //             : "none"
+                      //         }
+                      //                   className={`cursor-pointer transition-all duration-200
+                      //   ${
+                      //     (hover || rating) >= index
+                      //       ? "text-yellow-600"
+                      //       : "text-gray-300 dark:text-gray-700"
+                      //   }
+                      // `}
+                      //        onMouseEnter={() => setHover(index)}
+                      //         onMouseLeave={() => setHover(0)}
+                      //         onClick={() => handleRate(index, suit._id)}
+                      //       />
+                      //     ))}
+
+                      //   </div>
+                      // </div>
+
+                      <div className="flex items-center gap-1">
+                        {[1, 2, 3, 4, 5].map((index: any) => (
+                          <Star
+                            key={index}
+                            size={22}
+                            fill={
+                              (hovered[suit._id] || ratings[suit._id] || 0) >=
+                              index
+                                ? "currentColor"
+                                : "none"
+                            }
+                            className={`cursor-pointer transition-all duration-200 
+                            ${
+                              (hovered[suit._id] || ratings[suit._id] || 0) >=
+                              index
+                                ? "text-yellow-600"
+                                : "text-gray-300 dark:text-gray-700"
+                            }
+                          `}
+                            onMouseEnter={() =>
+                              setHovered((prev) => ({
+                                ...prev,
+                                [suit._id]: index,
+                              }))
+                            }
+                            onMouseLeave={() =>
+                              setHovered((prev) => ({ ...prev, [suit._id]: 0 }))
+                            }
+                            onClick={() => handleRate(suit._id, index)}
+                          />
+                        ))}
+                      </div>
                     )}
                   </div>
                 </div>
