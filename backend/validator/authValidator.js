@@ -5,6 +5,7 @@ export const registerSchema = Joi.object({
   phone:Joi.string()
       .required("Phone number is required"),
   password: Joi.string().min(6).required("Password is required"),
+  role_id:Joi.string().optional()
 
 });
 

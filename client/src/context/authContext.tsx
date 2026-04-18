@@ -7,34 +7,45 @@ const AuthContext = createContext({
   user: null,
   login: (userData: any) => {},
   logout: () => {},
+  isLoading: false,
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(true); // Prevent "flicker"
+  const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
+useEffect(() => {
+  const initAuth = () => {
     const token = Cookies.get("token");
-    const savedUser = Cookies.get("user_data");
+    const savedUser = localStorage.getItem("user_data");
 
     if (token && savedUser) {
-      setIsLoggedIn(true);
-      setUser(JSON.parse(savedUser));
+      try {
+        const parsed = JSON.parse(savedUser);
+        setUser(parsed);
+        setIsLoggedIn(true);
+      } catch (e) {
+        console.error("Failed to parse user data", e);
+      }
     }
     setIsLoading(false);
-  }, []);
+  };
+
+  initAuth();
+}, []);
 
   const login = (userData: any) => {
     setIsLoggedIn(true);
     setUser(userData);
-    // Persist the user data so it survives a refresh
-    Cookies.set("user_data", JSON.stringify(userData), { expires: 7 });
+
+    // ✅ save to localStorage instead of cookies
+    localStorage.setItem("user_data", JSON.stringify(userData));
   };
 
   const logout = () => {
     Cookies.remove("token");
-    Cookies.remove("user_data");
+    localStorage.removeItem("user_data"); // ✅ changed
     setIsLoggedIn(false);
     setUser(null);
   };
@@ -49,3 +60,4 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 };
 
 export const useAuth = () => useContext(AuthContext);
+

@@ -51,13 +51,14 @@ const navigationItems: NavigationItem[] = [
     href: "/admin/user",
     badge: "5",
   },
-  { id: "Reports and Analytics", 
-    name: "Reports", 
-    icon: FileText, 
-    href: "/admin/reports" },
+  {
+    id: "Reports and Analytics",
+    name: "Reports",
+    icon: FileText,
+    href: "/admin/reports",
+  },
 
-  { id: "settings", name:"Settings",
-     icon: Settings, href: "/admin/settings" },
+  { id: "settings", name: "Settings", icon: Settings, href: "/admin/settings" },
   // {
   //   id: "Suit-Categories",
   //   name: "Suit Categories",
@@ -72,7 +73,7 @@ const navigationItems: NavigationItem[] = [
   },
 ];
 
-export  function Sidebar({ className = "" }: SidebarProps) {
+export function Sidebar({ className = "" }: SidebarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [activeItem, setActiveItem] = useState("dashboard");
@@ -94,25 +95,29 @@ export  function Sidebar({ className = "" }: SidebarProps) {
 
   const toggleSidebar = () => setIsOpen(!isOpen);
   const toggleCollapse = () => setIsCollapsed(!isCollapsed);
+  const { logout } = useAuth();
 
-  const handleItemClick = async(itemId: string) => {
+  const handleItemClick = async (itemId: string) => {
     setActiveItem(itemId);
-const {logout}= useAuth()
-
-    const response =await apiClient.post('/auth/logout')
-    // console.log(response)
-
-          logout()
-      if(response.status===200){
-        window.location.href='/auth/login'
-
-      }
-    
 
     if (window.innerWidth < 768) {
       setIsOpen(false);
     }
   };
+
+  const { user } = useAuth();
+
+const handleLogut=async()=>{
+  
+    const response = await apiClient.post("/auth/logout");
+    // console.log(response)
+    logout();
+    if (response.status === 200) {
+      window.location.href = "/auth/login";
+    }
+
+}
+
 
   return (
     <>
@@ -150,32 +155,9 @@ const {logout}= useAuth()
         {/* Header with logo and collapse button */}
         <div className="flex items-center justify-between p-5 border-b border-slate-200 bg-slate-50/60">
           {!isCollapsed && (
-            // <div className="flex items-center space-x-2.5">
-            //   <div className="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center shadow-sm">
-            //     <Link href="/admin/dashboard">
-            //       <Image
-            //         src="/logo.png" // Path to your logo in /public
-            //         alt="Toksid Logo"
-            //         width={150}
-            //         height={50}
-            //         // className="object-none"
-            //         priority // Tells Next.js to load this immediately (good for logos)
-            //       />
-            //     </Link>{" "}
-            //   </div>
-            //   <div className="flex flex-col">
-            //     <span className="font-semibold text-slate-800 text-base">
-            //       TOKSIDO{" "}
-            //     </span>
-            //     <span className="text-xs text-slate-500">
-            //       Toksido Dashboard
-            //     </span>
-            //   </div>
-            // </div>
-
             <div className="flex items-center space-x-3">
               {/* 1. Removed fixed w-9 h-9 and bg-blue-600 to let the logo breathe */}
-              <div className="flex-shrink-0">
+              <div className="shrink-0">
                 <Link href="/admin/dashboard">
                   <Image
                     src="/icon.png"
@@ -336,7 +318,7 @@ const {logout}= useAuth()
                 </div>
                 <div className="flex-1 min-w-0 ml-2.5">
                   <p className="text-sm font-medium text-slate-800 truncate">
-                    John Doe
+                    {user?.username}{" "}
                   </p>
                   <p className="text-xs text-slate-500 truncate">
                     Senior Administrator
@@ -364,7 +346,13 @@ const {logout}= useAuth()
           {/* Logout Button */}
           <div className="p-3">
             <button
-              onClick={() => handleItemClick("logout")}
+              onClick={() => {handleItemClick("logout"),
+
+                handleLogut()
+              }
+              
+                  // console.log("Logout clicked");
+              }
               className={`
                 w-full flex items-center rounded-md text-left transition-all duration-200 group
                 text-red-600 hover:bg-red-50 hover:text-red-700 cursor-pointer

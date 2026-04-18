@@ -156,7 +156,7 @@ const userData = {
     sameSite: "strict",
   };
       // ✅ Set cookie
-   res.cookie("token", accessToken, { ...cookieOptions, maxAge: 15 * 60 * 1000 });
+   res.cookie("token" ,accessToken, { ...cookieOptions, maxAge: 15 * 60 * 1000 });
    res.cookie("refreshToken", refre_shToken, { ...cookieOptions, maxAge: 7 * 24 * 60 * 60 * 1000 });
 
       return res.status(200).json({

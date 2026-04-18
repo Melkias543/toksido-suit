@@ -1,6 +1,7 @@
 "use client";
 import { Sidebar } from "@/components/ui/modern-side-bar";
 import NavBar from "@/src/components/NavBar";
+import { useAuth } from "@/src/context/authContext";
 import apiClient from "@/src/utils/libs/api-client";
 import { Globe, Languages, LanguagesIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -12,25 +13,52 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
 
-const [loading, setLoading] = useState(true);
+const { user, isLoggedIn, isLoading: authLoading } = useAuth();
 const router = useRouter();
+const [verifyingServer, setVerifyingServer] = useState(true); // Start as true
 
 useEffect(() => {
-  const checkAuth = async () => {
+  // 1. Wait for AuthContext to finish reading localStorage/Cookies
+  if (authLoading) return;
+
+  // 2. Client-side check: If no user or not admin, bounce immediately
+  if (!isLoggedIn || user?.role !== "admin") {
+    router.push("/auth/login");
+    return;
+  }
+
+  // 3. Server-side check: Verify the actual token
+  const verifyToken = async () => {
     try {
-      // This endpoint should use authMiddleware and authorize('admin')
-      await apiClient.get("/auth/verify-admin");
-      setLoading(false);
+      const response = await apiClient.get("/auth/verify-admin");
+      if (response.status === 200) {
+        setVerifyingServer(false); // SUCCESS: Let them in
+      } else {
+        // router.push("/auth/login");
+      }
     } catch (err) {
-      // If 401 (No token) or 403 (Not admin), send to login
+      console.error("Verification failed", err);
       router.push("/auth/login");
     }
   };
 
-  checkAuth();
-}, [router]);
+  verifyToken();
+}, [authLoading, isLoggedIn, user, router]);
 
-if (loading) return <div>Loading Admin Panel...</div>;
+// IMPORTANT: Show loading if Context is loading OR if we are waiting for API verification
+if (authLoading || verifyingServer) {
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
+      <div className="relative flex h-12 w-12">
+        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+        <span className="relative inline-flex rounded-full h-12 w-12 bg-blue-500"></span>
+      </div>
+      <h2 className="mt-6 text-lg font-semibold text-gray-700 animate-pulse">
+        Loding...
+      </h2>
+    </div>
+  );
+}
 
 
   return (
