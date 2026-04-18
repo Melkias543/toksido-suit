@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   DollarSign,
   ShoppingCart,
@@ -13,6 +13,8 @@ import {
   User,
   ArrowUpRight,
 } from "lucide-react";
+import { useAuth } from "@/src/context/authContext";
+import { countSuit, countUser } from "@/src/api/AdminApi";
 
 type Props = {
   isDark: boolean;
@@ -20,14 +22,43 @@ type Props = {
 };
 
 const CentralDashboard = ({ isDark, setIsDark }: Props) => {
+  const { user } = useAuth();
+  const [userCount, setUserCount] = useState<number | any>(0);
+  const [suitCount, setSuitCount] = useState<number | any>(0);
+
+  // console.log("user count", userCount);
+  // console.log("suit count", suitCount);
+  useEffect(() => {
+    getUSerCount();
+    getSuitCount();
+  }, []);
+  const getUSerCount = async () => {
+    try {
+      const response = await countUser();
+      // console.log("all user",response)
+      setUserCount(response?.count);
+    } catch (error: any) {
+      console.log("error of fetching user count", user);
+    }
+  };
+  const getSuitCount = async () => {
+    try {
+      const response = await countSuit();
+      // console.log("all suit",response)
+      setSuitCount(response?.count);
+    } catch (error: any) {
+      console.log("error of fetching suit count", user);
+    }
+  };
+
   return (
     <div className="flex-1 w-full bg-gray-50 dark:bg-gray-950 p-4 md:p-8 overflow-y-auto transition-colors duration-300">
       {/* --- TOP HEADER --- */}
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
         <div>
           <h1 className="text-3xl font-black text-gray-900 dark:text-gray-100 tracking-tight">
-            Dashboard{" "}
-            <span className="text-blue-600 dark:text-blue-500">Admin Dashboard</span>
+            Admin{" "}
+            <span className="text-blue-600 dark:text-blue-500"> Dashboard</span>
           </h1>
           <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">
             Real-time analytics and system status for your store.
@@ -51,9 +82,9 @@ const CentralDashboard = ({ isDark, setIsDark }: Props) => {
 
           <button className="flex items-center gap-2 pl-2 pr-1 py-1 rounded-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-sm">
             <span className="text-xs font-bold text-gray-700 dark:text-gray-300 ml-2 hidden sm:block">
-              Admin
+              {user?.username}
             </span>
-            <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-blue-500 to-emerald-400 flex items-center justify-center text-white font-bold text-xs">
+            <div className="h-8 w-8 rounded-full bg-linear-to-tr from-blue-500 to-emerald-400 flex items-center justify-center text-white font-bold text-xs">
               AD
             </div>
           </button>
@@ -62,34 +93,34 @@ const CentralDashboard = ({ isDark, setIsDark }: Props) => {
 
       {/* --- STATS GRID --- */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-        <StatCard
+        {/* <StatCard
           title="Revenue"
           value="ETB 84,200"
           trend="+12.5%"
           Icon={DollarSign}
           color="blue"
-        />
+        /> */}
         <StatCard
           title="Active Users"
-          value="1,240"
+          value={userCount.length}
           trend="+4.2%"
           Icon={Users}
           color="emerald"
         />
         <StatCard
-          title="Sales Count"
-          value="456"
+          title="Total Suit"
+          value={suitCount}
           trend="+8.1%"
           Icon={ShoppingCart}
           color="purple"
         />
-        <StatCard
+        {/* <StatCard
           title="Stock Items"
           value="89"
           trend="Stable"
           Icon={Package}
           color="orange"
-        />
+        /> */}
       </div>
 
       {/* --- MAIN CONTENT AREA --- */}
@@ -265,7 +296,6 @@ type ProgressItemProps = {
   value: number;
   color: string; // keeps your original usage intact (bg-*)
 };
-
 
 const ProgressItem = ({ label, value, color }: ProgressItemProps) => (
   <div className="space-y-2">
