@@ -81,12 +81,18 @@ setRoles(role.data)
     }
   };
 
+
+
+
+  
+
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-[#1a2b3c] hover:bg-[#8e6d31] text-[#f8f5f0] gap-2 tracking-[0.2em] text-[10px] uppercase px-6 py-5 transition-all">
+        {/* <Button className="bg-[#1a2b3c] hover:bg-[#8e6d31] text-[#f8f5f0] gap-2 tracking-[0.2em] text-[10px] uppercase px-6 py-5 transition-all cursor-pointer">
           <UserPlus className="h-4 w-4" /> Add New Member
-        </Button>
+        </Button> */}
       </DialogTrigger>
 
       {/* PERFECT MOBILE VIEW LOGIC:

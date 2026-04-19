@@ -102,7 +102,7 @@ try {
       });
     }
 
-console.log("this is role id ",role_id)
+// console.log("this is role id ",role_id)
     // 3. Verify Role: Ensure the provided role_id actually exists in the DB
 const roleExists = await Role.findById(role_id);
     if (!roleExists) {
