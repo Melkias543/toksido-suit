@@ -1,38 +1,50 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect } from "react";
 import Cookies from "js-cookie";
+
 export interface User {
   id: string;
   name?: string;
   email?: string;
-  role: string; // This is the missing piece!
+  role: string; 
 }
-const AuthContext = createContext({
+
+// 1. Define the shape of the Context
+interface AuthContextType {
+  isLoggedIn: boolean;
+  user: User | null; // Use | for types, not ||
+  login: (userData: User) => void;
+  logout: () => void;
+  isLoading: boolean;
+}
+
+// 2. Initialize with the correct type
+const AuthContext = createContext<AuthContextType>({
   isLoggedIn: false,
-  user: User | null,
-  login: (userData: any) => {},
+  user: null,
+  login: () => {},
   logout: () => {},
-  isLoading: false,
+  isLoading: true,
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  // 3. Explicitly type the useState hook
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const initAuth = () => {
-      // const token = Cookies.get("token");
       const savedUser = localStorage.getItem("user_data");
 
       if (savedUser) {
         try {
-          const parsed = JSON.parse(savedUser);
+          const parsed: User = JSON.parse(savedUser);
           setUser(parsed);
           setIsLoggedIn(true);
-          setIsLoading(false);
         } catch (e) {
           console.error("Failed to parse user data", e);
+          localStorage.removeItem("user_data");
         }
       }
       setIsLoading(false);
@@ -41,17 +53,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     initAuth();
   }, []);
 
-  const login = (userData: any) => {
+  const login = (userData: User) => {
     setIsLoggedIn(true);
     setUser(userData);
-
-    // ✅ save to localStorage instead of cookies
     localStorage.setItem("user_data", JSON.stringify(userData));
   };
 
   const logout = () => {
     Cookies.remove("token");
-    localStorage.removeItem("user_data"); // ✅ changed
+    localStorage.removeItem("user_data");
     setIsLoggedIn(false);
     setUser(null);
   };
@@ -60,6 +70,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     <AuthContext.Provider
       value={{ isLoggedIn, user, login, logout, isLoading }}
     >
+      {/* Note: If you hide children until loading is done, 
+          make sure your root layout can handle the empty flash. 
+      */}
       {!isLoading && children}
     </AuthContext.Provider>
   );
