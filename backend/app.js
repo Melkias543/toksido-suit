@@ -13,7 +13,7 @@ const app = express();
 app.use(passport.initialize());
 // app.use(cors());
 app.use(cors({
-  origin: "http://localhost:3000", // your Frontend's URL
+  origin: "https://toksido.vercel.app", // your Frontend's URL
   methods: ["GET", "POST", "PUT","PATCH", "DELETE"],
   credentials: true,
 }));
