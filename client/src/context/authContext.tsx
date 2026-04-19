@@ -15,25 +15,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-useEffect(() => {
-  const initAuth = () => {
-    const token = Cookies.get("token");
-    const savedUser = localStorage.getItem("user_data");
+  useEffect(() => {
+    const initAuth = () => {
+      // const token = Cookies.get("token");
+      const savedUser = localStorage.getItem("user_data");
 
-    if (token && savedUser) {
-      try {
-        const parsed = JSON.parse(savedUser);
-        setUser(parsed);
-        setIsLoggedIn(true);
-      } catch (e) {
-        console.error("Failed to parse user data", e);
+      if (savedUser) {
+        try {
+          const parsed = JSON.parse(savedUser);
+          setUser(parsed);
+          setIsLoggedIn(true);
+          setIsLoading(false);
+        } catch (e) {
+          console.error("Failed to parse user data", e);
+        }
       }
-    }
-    setIsLoading(false);
-  };
+      setIsLoading(false);
+    };
 
-  initAuth();
-}, []);
+    initAuth();
+  }, []);
 
   const login = (userData: any) => {
     setIsLoggedIn(true);
@@ -60,4 +61,3 @@ useEffect(() => {
 };
 
 export const useAuth = () => useContext(AuthContext);
-

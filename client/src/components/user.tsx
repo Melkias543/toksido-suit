@@ -1,5 +1,4 @@
 "use client";
-
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
@@ -7,8 +6,8 @@ import {
   UserPlus,
   Mail,
   Trash2,
-  Loader2, // Added for loading icon
-  UserSearch, // Added for empty state icon
+  Loader2,
+  UserSearch,
 } from "lucide-react";
 import {
   Table,
@@ -26,7 +25,16 @@ import Swal from "sweetalert2";
 export default function UserList() {
   const [open, setOpen] = useState(false);
   const [user, setUser] = useState([]);
-  const [loading, setLoading] = useState(true); // New loading state
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Logic to filter the users based on the search input
+  const filteredItems = user.filter(
+    (item: any) =>
+      item.username?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.phone?.includes(searchQuery),
+  );
 
   useEffect(() => {
     fetchAllUser();
@@ -34,20 +42,20 @@ export default function UserList() {
 
   const fetchAllUser = async () => {
     try {
-      setLoading(true); // Start loading
-      const user = await getAllUser();
-      setUser(user?.users || []);
+      setLoading(true);
+      const data = await getAllUser();
+      setUser(data?.users || []);
     } catch (error) {
-      console.log(error);
+      console.error("Error fetching users:", error);
     } finally {
-      setLoading(false); // End loading
+      setLoading(false);
     }
   };
 
-  const handleDelete = async (user: any) => {
+  const handleDelete = async (userData: any) => {
     try {
       const result = await Swal.fire({
-        title: `Are you sure to Delete ${user?.username} ?`,
+        title: `Are you sure to Delete ${userData?.username}?`,
         text: "You won't be able to revert this!",
         icon: "warning",
         showCancelButton: true,
@@ -55,19 +63,18 @@ export default function UserList() {
         cancelButtonColor: "#d33",
         confirmButtonText: "Yes, delete it!",
       });
-      if (!result.isConfirmed) {
-        return;
-      }
 
-      const respone = await deleteUser(user._id);
+      if (!result.isConfirmed) return;
+
+      const response = await deleteUser(userData._id);
       Swal.fire({
         title: "Deleted!",
-        text: respone.message || "Your file has been deleted.",
+        text: response.message || "User has been deleted.",
         icon: "success",
       });
-      fetchAllUser(); // Refresh list after delete
+      fetchAllUser();
     } catch (error) {
-      console.log(error);
+      console.error("Error deleting user:", error);
     }
   };
 
@@ -84,7 +91,9 @@ export default function UserList() {
             <span className="font-serif italic text-amber-700">Directory</span>
           </h1>
         </div>
+
         <AdminAddUser open={open} setOpen={setOpen} />
+
         <div className="flex items-center gap-4">
           <div className="relative hidden sm:block">
             <Search
@@ -94,6 +103,8 @@ export default function UserList() {
             <input
               placeholder="Search by name or email..."
               className="pl-10 h-12 bg-slate-50 border border-slate-200 rounded-none focus:border-amber-700 focus:outline-none w-[320px] text-sm tracking-tight transition-all text-slate-950 placeholder:text-slate-400"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
           <Button
@@ -141,38 +152,40 @@ export default function UserList() {
                   </div>
                 </TableCell>
               </TableRow>
-            ) : user.length === 0 ? (
+            ) : filteredItems.length === 0 ? (
               /* --- NOT FOUND / EMPTY STATE --- */
               <TableRow>
                 <TableCell colSpan={5} className="h-64 text-center">
                   <div className="flex flex-col items-center justify-center gap-3">
                     <UserSearch className="h-12 w-12 text-slate-200" />
                     <p className="text-sm font-serif italic text-slate-500">
-                      No clients found in the directory.
+                      {searchQuery
+                        ? `No results found for "${searchQuery}"`
+                        : "No clients found in the directory."}
                     </p>
                   </div>
                 </TableCell>
               </TableRow>
             ) : (
               /* --- DATA LIST --- */
-              user?.map((user: any) => (
+              filteredItems.map((item: any) => (
                 <TableRow
-                  key={user?._id}
+                  key={item?._id}
                   className="group border-b border-slate-100 hover:bg-slate-50 transition-colors"
                 >
                   <TableCell className="py-6">
                     <div className="w-14 h-14 rounded-none overflow-hidden border-2 border-slate-950 group-hover:border-amber-700 transition-all duration-300 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)] flex items-center justify-center bg-gray-200">
-                      {user.avatar ? (
+                      {item.avatar ? (
                         <Image
-                          src={user.avatar}
-                          alt={user.username || "User"}
+                          src={item.avatar}
+                          alt={item.username || "User"}
                           width={56}
                           height={56}
                           className="object-cover w-full h-full"
                         />
                       ) : (
                         <span className="text-xl font-bold text-gray-700">
-                          {user.username?.charAt(0).toUpperCase()}
+                          {item.username?.charAt(0).toUpperCase()}
                         </span>
                       )}
                     </div>
@@ -181,11 +194,11 @@ export default function UserList() {
                   <TableCell>
                     <div className="flex flex-col">
                       <span className="text-lg font-black text-slate-950 tracking-tight group-hover:text-amber-700 transition-colors">
-                        {user?.username}
+                        {item?.username}
                       </span>
                       <div className="flex items-center text-sm text-slate-600 font-medium mt-1">
                         <Mail size={14} className="mr-2 text-amber-700" />
-                        {user?.email}
+                        {item?.email}
                       </div>
                     </div>
                   </TableCell>
@@ -193,11 +206,13 @@ export default function UserList() {
                   <TableCell>
                     <div className="flex flex-col">
                       <span className="text-sm font-black text-slate-800 uppercase tracking-wide">
-                        {user?.role_id?.name || "Client"}
+                        {item?.role_id?.name || "Client"}
                       </span>
                       <span className="text-xs text-slate-500 font-medium italic">
                         Provisioned{" "}
-                        {new Date(user.createdAt).toLocaleDateString()}
+                        {item.createdAt
+                          ? new Date(item.createdAt).toLocaleDateString()
+                          : "N/A"}
                       </span>
                     </div>
                   </TableCell>
@@ -206,7 +221,7 @@ export default function UserList() {
                     <div className="flex items-center gap-3">
                       <span className="w-3 h-3 bg-slate-950" />
                       <span className="text-xs uppercase font-black tracking-widest text-slate-950">
-                        {user?.phone || "No Phone"}
+                        {item?.phone || "No Phone"}
                       </span>
                     </div>
                   </TableCell>
@@ -214,7 +229,7 @@ export default function UserList() {
                   <TableCell className="text-right pr-6">
                     <div className="flex justify-end items-center gap-4">
                       <button
-                        onClick={() => handleDelete(user)}
+                        onClick={() => handleDelete(item)}
                         className="p-2 text-slate-400 hover:text-red-700 hover:bg-red-50 transition-all"
                         title="Delete"
                       >
