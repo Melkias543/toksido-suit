@@ -12,7 +12,6 @@ import {
 import { Star } from "lucide-react"; // Elegant for a luxury brand
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { AnyARecord } from "dns";
 import { deleteProduct, getAllProducts } from "../api/AdminApi";
 interface ProductCardProps {
   suits: any; // Ideally, define a proper interface for your suit

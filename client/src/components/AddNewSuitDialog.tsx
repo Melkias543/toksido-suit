@@ -6,13 +6,10 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-
-// import { DropdownMenuGroup, DropdownMenuItem } from "@radix-ui/react-dropdown-menu";
 import {
   Select,
   SelectContent,
@@ -22,13 +19,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Globe, Package, DollarSign, Camera, X, ImageIcon } from "lucide-react";
-
 import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -37,42 +32,29 @@ import z from "zod";
 import Swal from "sweetalert2";
 import AddCategory from "./AddCategory";
 import { createProduct, getAllCategories, updateProduct } from "../api/AdminApi";
-type ProductForm = z.infer<typeof productSchema>;
 import Cookies from "js-cookie";
-const languages = ["en", "am", "or"] as const;
+
+type ProductForm = z.infer<typeof productSchema>;
+type CategoryFormValues = z.infer<typeof categorySchema>;
 type Lang = "en" | "am" | "or";
+
+const languages = ["en", "am", "or"] as const;
+
 interface SuitDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  suitToEdit?: any; 
+  suitToEdit?: any;
 }
-type CategoryFormValues = z.infer<typeof categorySchema>;
 
-export function SuitDialog({
-  isOpen,
-  onOpenChange,
-  suitToEdit,
-}: SuitDialogProps) {
+export function SuitDialog({ isOpen, onOpenChange, suitToEdit }: SuitDialogProps) {
   const [openForCategory, setOpenForCategory] = useState(false);
   const isEditMode = !!suitToEdit;
   const [preview, setPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [categories, setCategories] = useState<CategoryFormValues[]>([]);
-  useEffect(() => {
-    fetchCategories();
-  }, []);
 
-  const fetchCategories = async () => {
-    try {
-      const data = await getAllCategories();
-      // console.log("Fetched categories:", data.categories);
-      setCategories(data?.categories);
-    } catch (error) {
-      console.error("Error fetching categories:", error);
-    }
-  };
-  const locale = Cookies.get("NEXT_LOCALE") || ("en" as Lang);
-  // console.log("Language from cookies:", locale);
+  const locale = (Cookies.get("NEXT_LOCALE") as Lang) || "en";
+
   const {
     handleSubmit,
     register,
@@ -89,26 +71,22 @@ export function SuitDialog({
       image: null,
     },
   });
+
   const { ref: registerRef, ...imageRegisterProps } = register("image");
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (preview) URL.revokeObjectURL(preview);
-      const url = URL.createObjectURL(file);
-      setPreview(url);
-      // Manually update RHF value
-      setValue("image", file, { shouldValidate: true });
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async () => {
+    try {
+      const data = await getAllCategories();
+      setCategories(data?.categories);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
     }
   };
-  const removeImage = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (preview) URL.revokeObjectURL(preview); // ✅ important
-    setPreview(null);
-  };
 
-  // 🔥 EFFECT: Populate form when suitToEdit changes
   useEffect(() => {
     if (isEditMode && suitToEdit) {
       reset({
@@ -116,13 +94,10 @@ export function SuitDialog({
         description: suitToEdit.description,
         category_id: suitToEdit.category_id,
         price: suitToEdit.price,
-        image: null, // Images usually handled separately via preview
+        image: null,
       });
-      // Set image preview if editing and an image exists
       if (suitToEdit.image) {
-        setPreview(
-          `${process.env.NEXT_PUBLIC_IMAGES_URL}/uploads/${suitToEdit.image}`,
-        );
+        setPreview(`${process.env.NEXT_PUBLIC_IMAGES_URL}/uploads/${suitToEdit.image}`);
       }
     } else {
       reset({
@@ -131,13 +106,29 @@ export function SuitDialog({
         category_id: "",
         price: 0,
         image: null,
-      });(open: boolean) => void
+      });
       setPreview(null);
     }
   }, [suitToEdit, isOpen, reset]);
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (preview) URL.revokeObjectURL(preview);
+      const url = URL.createObjectURL(file);
+      setPreview(url);
+      setValue("image", file, { shouldValidate: true });
+    }
+  };
+
+  const removeImage = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (preview) URL.revokeObjectURL(preview);
+    setPreview(null);
+  };
+
   const onSubmit = async (data: any) => {
-    // console.log(" Data:", data);
     try {
       if (!data.category_id) {
         Swal.fire({
@@ -148,22 +139,14 @@ export function SuitDialog({
         });
         return;
       }
+
       const formData = new FormData();
+
       if (data.image) {
-        // Extract the file whether it's in a FileList or a single File
-        const fileToUpload =
-          data.image instanceof FileList ? data.image[0] : data.image;
-
+        const fileToUpload = data.image instanceof FileList ? data.image[0] : data.image;
         if (fileToUpload) {
-          // FORCE binary recognition by wrapping it in a new Blob
-          const binaryFile = new Blob([fileToUpload], {
-            type: fileToUpload.type,
-          });
-
-          // Append the Blob and provide the original filename
+          const binaryFile = new Blob([fileToUpload], { type: fileToUpload.type });
           formData.append("image", binaryFile, fileToUpload.name);
-
-          // console.log("Binary file attached:", fileToUpload.name);
         }
       }
 
@@ -171,45 +154,35 @@ export function SuitDialog({
       formData.append("name[en]", data.name.en);
       formData.append("name[am]", data.name.am);
       formData.append("name[or]", data.name.or);
-
       formData.append("description[en]", data.description.en);
       formData.append("description[am]", data.description.am);
       formData.append("description[or]", data.description.or);
       formData.append("category_id", data.category_id);
-      // console.log("Form Data to be submitted:", formData);
-      // const product = await createProduct(formData);
-let response;
-if (isEditMode) {
-  // 🔥 Update Existing
-  response = await updateProduct(suitToEdit._id, formData);
 
-} else {
-  // 🆕 Create New
-  response = await createProduct(formData);
-}
-
-
-
+      let response;
+      if (isEditMode) {
+        response = await updateProduct(suitToEdit._id, formData);
+      } else {
+        response = await createProduct(formData);
+      }
 
       Swal.fire({
-        title: `${isEditMode ? "updated" : "Created"}`,
-        text:
-          response?.message ||
-          `Suit ${isEditMode ? "updated" : "added"} successfully.`,
+        title: `${isEditMode ? "Updated" : "Created"}`,
+        text: response?.message || `Suit ${isEditMode ? "updated" : "added"} successfully.`,
         icon: "success",
         confirmButtonText: "OK",
       });
       reset();
       onOpenChange(false);
     } catch (error: any) {
-      const errors =
+      const errMsg =
         error.response?.data?.message ||
         error.message ||
         "An error occurred while submitting the suit.";
       Swal.fire({
         icon: "error",
         title: "Submission Failed",
-        text: errors,
+        text: errMsg,
         confirmButtonText: "OK",
       });
     }
@@ -219,28 +192,22 @@ if (isEditMode) {
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-175 rounded-none border-2 border-slate-950 p-0 bg-white shadow-[20px_20px_0px_0px_rgba(0,0,0,0.1)] overflow-hidden">
         <form onSubmit={handleSubmit(onSubmit)}>
-          {/* --- HEADER --- */}
           <DialogHeader className="p-8 bg-slate-50 border-b border-slate-100">
             <h2 className="text-[10px] uppercase tracking-[0.5em] text-amber-700 font-black">
               Atelier Vault
             </h2>
             <DialogTitle className="text-4xl font-black tracking-tighter text-slate-950">
               New
-              <span className="font-serif italic text-amber-700 ml-1.5">
-                Garment
-              </span>
+              <span className="font-serif italic text-amber-700 ml-1.5">Garment</span>
             </DialogTitle>
           </DialogHeader>
 
           <div className="p-8 space-y-8 max-h-[75vh] overflow-y-auto">
-            {/* --- GLOBAL DATA GRID --- */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-              {/* Left Column: Stats */}
               <div className="space-y-6">
                 <div className="space-y-2">
                   <Label className="text-[10px] font-black uppercase tracking-widest flex items-center gap-2 text-slate-950">
-                    <DollarSign size={14} className="text-amber-700" />{" "}
-                    Valuation (ETB)
+                    <DollarSign size={14} className="text-amber-700" /> Valuation (ETB)
                   </Label>
                   <Input
                     type="number"
@@ -249,31 +216,23 @@ if (isEditMode) {
                     {...register("price", { valueAsNumber: true })}
                   />
                   {errors.price && (
-                    <p className="text-red-600 text-sm mt-1">
-                      {errors.price.message}
-                    </p>
+                    <p className="text-red-600 text-sm mt-1">{errors.price.message}</p>
                   )}
                 </div>
+
                 <div className="space-y-2 w-2.5">
                   <Label className="text-[10px] font-black uppercase tracking-widest flex items-center gap-2 text-slate-950">
                     <Package size={14} className="text-amber-700" /> Category
                   </Label>
-
                   <div className="flex flex-col gap-2">
-                    <Select
-                      onValueChange={(value) => {
-                        setValue("category_id", value); // 🔥 THIS is the fix
-                      }}
-                    >
+                    <Select onValueChange={(value) => setValue("category_id", value)}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select a category" />
                       </SelectTrigger>
-
                       <SelectContent>
                         <SelectGroup>
                           <SelectLabel>Categories</SelectLabel>
-
-                          {categories.map((category) => (
+                          {categories.map((category: any) => (
                             <SelectItem key={category._id} value={category._id}>
                               {category.name.locale ||
                                 category.name.en ||
@@ -287,7 +246,7 @@ if (isEditMode) {
                               type="button"
                               className="w-full text-left text-amber-900 font-bold hover:underline"
                               onClick={(e) => {
-                                e.preventDefault(); // Prevent the Select from closing immediately if needed
+                                e.preventDefault();
                                 setOpenForCategory(true);
                               }}
                             >
@@ -298,11 +257,8 @@ if (isEditMode) {
                       </SelectContent>
                     </Select>
                   </div>
-
                   {errors.category_id && (
-                    <p className="text-red-600 text-sm mt-1">
-                      {errors.category_id.message}
-                    </p>
+                    <p className="text-red-600 text-sm mt-1">{errors.category_id.message}</p>
                   )}
                 </div>
               </div>
@@ -312,38 +268,34 @@ if (isEditMode) {
                 setOpenForCategory={setOpenForCategory}
               />
 
-              {/* Right Column: Image Upload */}
               <div className="space-y-2">
                 <Label className="text-[10px] font-black uppercase tracking-widest flex items-center gap-2 text-slate-950">
-                  <ImageIcon size={14} className="text-amber-700" /> Showcase
-                  Image
+                  <ImageIcon size={14} className="text-amber-700" /> Showcase Image
                 </Label>
-
                 <div
-                  onClick={() => fileInputRef.current?.click()} // ✅ trigger hidden input
-                  className="relative border-2 border-dashed border-slate-200 h-[132px] flex flex-col items-center justify-center group hover:border-amber-700 hover:bg-slate-50 transition-all cursor-pointer overflow-hidden bg-white"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="relative border-2 border-dashed border-slate-200 h-33 flex flex-col items-center justify-center group hover:border-amber-700 hover:bg-slate-50 transition-all cursor-pointer overflow-hidden bg-white"
                 >
                   <input
                     type="file"
                     accept="image/*"
                     className="hidden"
                     {...register("image")}
-                    ref={fileInputRef} // ✅ assign ref here
+                    ref={fileInputRef}
                     onChange={(e) => handleFileChange(e)}
                   />
-
                   {preview ? (
                     <>
                       <Image
                         src={preview}
                         alt="Preview"
                         fill
-                        className="object-contain p-2" // Changed from object-cover to object-contain
+                        className="object-contain p-2"
                         sizes="(max-width: 768px) 100vw, 53vw"
                       />
                       <button
                         onClick={(e) => {
-                          e.stopPropagation(); // prevent triggering input click
+                          e.stopPropagation();
                           removeImage(e);
                         }}
                         className="absolute top-2 right-2 bg-slate-950 text-white p-1 hover:bg-red-600 z-10"
@@ -364,14 +316,11 @@ if (isEditMode) {
                   )}
                 </div>
                 {errors.image?.message && (
-                  <p className="text-red-600 text-sm mt-1">
-                    {String(errors.image.message)}
-                  </p>
+                  <p className="text-red-600 text-sm mt-1">{String(errors.image.message)}</p>
                 )}
               </div>
             </div>
 
-            {/* --- TRILINGUAL TABS --- */}
             <div className="pt-4 border-t border-slate-100">
               <div className="flex items-center gap-2 mb-4">
                 <Globe size={14} className="text-amber-700" />
@@ -434,7 +383,6 @@ if (isEditMode) {
             </div>
           </div>
 
-          {/* --- FOOTER --- */}
           <DialogFooter className="p-8 bg-slate-50 border-t border-slate-100 flex flex-row items-center justify-end gap-4">
             <Button
               type="button"
@@ -454,7 +402,7 @@ if (isEditMode) {
                   : "Adding..."
                 : isEditMode
                   ? "Update Piece"
-                  : "Add to Inventory"}{" "}
+                  : "Add to Inventory"}
             </Button>
           </DialogFooter>
         </form>

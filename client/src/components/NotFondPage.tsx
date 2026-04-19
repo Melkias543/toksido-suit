@@ -1,8 +1,8 @@
 import { PackageOpen } from 'lucide-react';
 import React from 'react'
-type props= {
-    title:String
-    desc:String
+type props = {
+  title: string;
+  desc: string;
 }
 function NotFondPage({title,desc}:props) {
   return (

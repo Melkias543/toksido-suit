@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon app.js",
+    "seed": "npm run seed:roles && npm run seed:users",
     "build": "echo Build step done",
     "start": "node app.js",
     "seed": "npm run seed:roles && npm run seed:users",

@@ -14,8 +14,6 @@ import {
 } from "@/components/ui/dialog";
 import { UserPlus } from "lucide-react";
 import { addUserByAdmin, getAllROle } from "../api/AdminApi";
-import { select } from "three/tsl";
-
 type Props = {
   open: boolean;
   setOpen: (open: boolean) => void;

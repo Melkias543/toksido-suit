@@ -1,4 +1,3 @@
-import { tr } from "zod/locales";
 import apiClient from "../utils/libs/api-client";
 
 export const createCategory = async (categoryData: any) => {
@@ -48,7 +47,7 @@ export const getAllProducts = async () => {
   }
 };
 
-export const updateProduct = async (id: String, data: any) => {
+export const updateProduct = async (id: string, data: any) => {
   try {
     // products;
     const resp = await apiClient.put(`/products/${id}`, data, {
@@ -62,7 +61,7 @@ export const updateProduct = async (id: String, data: any) => {
   }
 };
 
-export const deleteProduct = async (id: String) => {
+export const deleteProduct = async (id: string) => {
   try {
     const res = await apiClient.delete(`/products/${id}`);
     return res;
@@ -84,7 +83,7 @@ export const createServices = async (data: any) => {
 
 //UPDATE SERVICES
 
-export const updateServices = async (data: any, id: String) => {
+export const updateServices = async (data: any, id: string) => {
   try {
     console.log("data and id", data, id);
     const response = await apiClient.put(`/service/${id}`, data);
@@ -117,7 +116,7 @@ export const getSingleServices = async (id: string) => {
 };
 
 // DELETE SERVICES
-export const deleteServices = async (id: String) => {
+export const deleteServices = async (id: string) => {
   try {
     const response = await apiClient.delete(`/service/${id}`);
 
