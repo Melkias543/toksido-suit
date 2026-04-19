@@ -7,7 +7,6 @@
   "scripts": {
     "dev": "nodemon app.js",
     "dev": "nodemon app.js",
-    "build": "next build",
     "start": "node server.js",
     "seed": "npm run seed:roles && npm run seed:users",
 
