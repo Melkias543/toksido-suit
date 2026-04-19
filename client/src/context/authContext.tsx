@@ -1,7 +1,11 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect } from "react";
 import Cookies from "js-cookie";
-
+interface User {
+  id: string;
+  email: string;
+  role: "admin" | "user"; // Define the specific roles you use
+}
 const AuthContext = createContext({
   isLoggedIn: false,
   user: null,
@@ -12,7 +16,7 @@ const AuthContext = createContext({
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<User|null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
