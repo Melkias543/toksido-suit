@@ -1,28 +1,40 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect } from "react";
 import Cookies from "js-cookie";
+
 export interface User {
   id: string;
   name?: string;
   email?: string;
-  role: string; // This is the missing piece!
+  role: string;
 }
-const AuthContext = createContext({
+
+// 1. Define a proper Interface for the Context state
+interface AuthContextType {
+  isLoggedIn: boolean;
+  user: User | null;
+  login: (userData: User) => void;
+  logout: () => void;
+  isLoading: boolean;
+}
+
+// 2. Initialize the context with the correct type using <AuthContextType>
+const AuthContext = createContext<AuthContextType>({
   isLoggedIn: false,
-  user: User | null,
-  login: (userData: any) => {},
+  user: null,
+  login: () => {},
   logout: () => {},
-  isLoading: false,
+  isLoading: true, // Start as true to match your initial state
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState(null);
+  // 3. Explicitly tell the state that it can hold a User or null
+  const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const initAuth = () => {
-      // const token = Cookies.get("token");
       const savedUser = localStorage.getItem("user_data");
 
       if (savedUser) {
@@ -30,7 +42,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           const parsed = JSON.parse(savedUser);
           setUser(parsed);
           setIsLoggedIn(true);
-          setIsLoading(false);
         } catch (e) {
           console.error("Failed to parse user data", e);
         }
@@ -41,7 +52,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     initAuth();
   }, []);
 
-  const login = (userData: any) => {
+  const login = (userData: User) => {
     setIsLoggedIn(true);
     setUser(userData);
 
@@ -51,7 +62,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = () => {
     Cookies.remove("token");
-    localStorage.removeItem("user_data"); // ✅ changed
+    localStorage.removeItem("user_data"); 
     setIsLoggedIn(false);
     setUser(null);
   };
