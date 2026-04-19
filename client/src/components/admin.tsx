@@ -6,7 +6,7 @@ const AdminAllInOne = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [showForm, setShowForm] = useState(false);
 
-  const handleTabChange = (tabId:any) => {
+  const handleTabChange = (tabId: string) => {
     setActiveTab(tabId);
     setShowForm(false);
   };
@@ -93,14 +93,26 @@ const AdminAllInOne = () => {
 
 // ✅ ADDED (REQUIRED)
 
-const StatCard = ({ title, value, color }) => (
+interface StatCardProps {
+  title: string;
+  value: string | number;
+  color: string;
+}
+
+const StatCard = ({ title, value, color }: StatCardProps) => (
   <div className={`bg-white p-6 rounded-3xl shadow-sm border-l-4 ${color}`}>
     <p className="text-xs text-slate-400 mb-1">{title}</p>
     <p className="text-2xl font-bold text-slate-900">{value}</p>
   </div>
 );
 
-const FormInput = ({ label, placeholder, isAmharic }) => (
+interface FormInputProps {
+  label: string;
+  placeholder: string;
+  isAmharic?: boolean;
+}
+
+const FormInput = ({ label, placeholder, isAmharic }: FormInputProps) => (
   <div>
     <label className="text-xs text-slate-500 block mb-2">{label}</label>
     <input

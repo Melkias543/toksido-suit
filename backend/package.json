@@ -7,6 +7,7 @@
   "scripts": {
     "start": "nodemon app.js",
     "dev": "nodemon app.js",
+    "seed": "npm run seed:roles && npm run seed:users",
     "seed:roles": "node seed/roleSeed.js",
     "seed:users": "node seed/seedUsers.js"
   },
