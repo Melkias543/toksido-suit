@@ -5,8 +5,10 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "nodemon app.js",
     "dev": "nodemon app.js",
+    "dev": "nodemon app.js",
+    "build": "next build",
+    "start": "node server.js"
     "seed:roles": "node seed/roleSeed.js",
     "seed:users": "node seed/seedUsers.js"
   },
