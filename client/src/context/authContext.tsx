@@ -28,6 +28,7 @@ const AuthContext = createContext<AuthContextType>({
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  // 3. Explicitly type the useState hook
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   // 3. Explicitly tell the state that it can hold a User or null
   const [user, setUser] = useState<User | null>(null);
@@ -39,11 +40,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       if (savedUser) {
         try {
-          const parsed = JSON.parse(savedUser);
+          const parsed: User = JSON.parse(savedUser);
           setUser(parsed);
           setIsLoggedIn(true);
         } catch (e) {
           console.error("Failed to parse user data", e);
+          localStorage.removeItem("user_data");
         }
       }
       setIsLoading(false);
@@ -55,8 +57,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const login = (userData: User) => {
     setIsLoggedIn(true);
     setUser(userData);
-
-    // ✅ save to localStorage instead of cookies
     localStorage.setItem("user_data", JSON.stringify(userData));
   };
 
@@ -71,6 +71,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     <AuthContext.Provider
       value={{ isLoggedIn, user, login, logout, isLoading }}
     >
+      {/* Note: If you hide children until loading is done, 
+          make sure your root layout can handle the empty flash. 
+      */}
       {!isLoading && children}
     </AuthContext.Provider>
   );
