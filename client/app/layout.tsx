@@ -20,7 +20,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Toksido Suit | Crafted for Excellence",
   description:
-    "Defining menswear through precision, heritage, and contemporary design since 2026.",
+    "Defining menswear through precision, heritage, and contemporary design since 2015.",
   icons: {
     icon: "/logo.png", // Ensure you have a favicon in /public
   },
