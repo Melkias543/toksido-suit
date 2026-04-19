@@ -6,30 +6,31 @@ export interface User {
   id: string;
   name?: string;
   email?: string;
-  role: string; 
+  role: string;
 }
 
-// 1. Define the shape of the Context
+// 1. Define a proper Interface for the Context state
 interface AuthContextType {
   isLoggedIn: boolean;
-  user: User | null; // Use | for types, not ||
+  user: User | null;
   login: (userData: User) => void;
   logout: () => void;
   isLoading: boolean;
 }
 
-// 2. Initialize with the correct type
+// 2. Initialize the context with the correct type using <AuthContextType>
 const AuthContext = createContext<AuthContextType>({
   isLoggedIn: false,
   user: null,
   login: () => {},
   logout: () => {},
-  isLoading: true,
+  isLoading: true, // Start as true to match your initial state
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   // 3. Explicitly type the useState hook
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // 3. Explicitly tell the state that it can hold a User or null
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -61,7 +62,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = () => {
     Cookies.remove("token");
-    localStorage.removeItem("user_data");
+    localStorage.removeItem("user_data"); 
     setIsLoggedIn(false);
     setUser(null);
   };
