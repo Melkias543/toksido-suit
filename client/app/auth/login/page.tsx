@@ -34,16 +34,17 @@ const {login}= useAuth()
         text: respone.message,
         timer: 3000,
         timerProgressBar: true,
-      }).then(() => {
+      }).then(async() => {
 
-         login(respone.user)
-        if (respone.user.role == "admin") {
+        await login(respone.user)
+        const isAdmin = respone.user.role.toLowerCase() === "admin";
+        if (isAdmin) {
 
-          setTimeout(() => {
-          router.push("/admin/dashboard");
-    }, 100);
+          // setTimeout(() => {
+          router.replace("/admin/dashboard");
+    // }, 100);
         }else{
-          router.push("/products");
+          router.replace("/products");
 
         }
 
