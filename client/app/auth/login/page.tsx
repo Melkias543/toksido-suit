@@ -40,7 +40,7 @@ const {login}= useAuth()
         if (respone.user.role == "admin") {
           router.push("/admin/dashboard");
         }else{
-          router.push("/");
+          router.push("/products");
 
         }
 
