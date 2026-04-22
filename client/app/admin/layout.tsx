@@ -18,27 +18,24 @@ const router = useRouter();
 const [verifyingServer, setVerifyingServer] = useState(true); // Start as true
 
 useEffect(() => {
-  // 1. Wait for AuthContext to finish reading localStorage/Cookies
   if (authLoading) return;
 
-  // 2. Client-side check: If no user or not admin, bounce immediately
-  if (!isLoggedIn || user?.role !== "admin") {
-    router.push("/auth/login");
+  // 1. Client-side check: ONLY bounce if we are 100% sure there is no user
+  // If there IS a user, we wait for the server to verify the role
+  if (!isLoggedIn) {
+    router.replace("/auth/login");
     return;
   }
 
-  // 3. Server-side check: Verify the actual token
   const verifyToken = async () => {
     try {
       const response = await apiClient.get("/auth/verify-admin");
       if (response.status === 200) {
-        setVerifyingServer(false); // SUCCESS: Let them in
-      } else {
-        // router.push("/auth/login");
+        setVerifyingServer(false); 
       }
     } catch (err) {
-      console.error("Verification failed", err);
-      router.push("/auth/login");
+      console.error("Admin verification failed:", err);
+      router.replace("/auth/login"); // Only redirect if the SERVER says no
     }
   };
 
