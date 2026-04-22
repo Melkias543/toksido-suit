@@ -24,11 +24,11 @@ apiClient.interceptors.response.use(
 
       try {
         // Use a standard axios call here to avoid interceptor recursion
-        await axios.post(
-          "http://localhost:8000/api/auth/refresh",
-          {},
-          { withCredentials: true },
-        );
+       await axios.post(
+  `${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`,
+  {},
+  { withCredentials: true }
+);
 
         // Retry the original request with the new cookie
         return apiClient(originalRequest);
