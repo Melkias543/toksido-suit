@@ -8,8 +8,8 @@ import connectDB from './config/db.config.js';
 import router from './index.js';
 import passport from "passport";
 dotenv.config();
-app.set('trust proxy', 1);
 const app = express();
+app.set('trust proxy', 1);
 app.use(passport.initialize());
 // app.use(cors());
 app.use(cors({
