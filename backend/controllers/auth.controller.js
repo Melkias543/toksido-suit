@@ -28,11 +28,13 @@ GenerateRefreshToken:async(req, res)=>{
       { expiresIn: "15m" }
     );
 
-      const cookieOptions = {
-         httpOnly: true,
-       secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
-  };
+   const cookieOptions = {
+  httpOnly: true,
+  // MUST be true for sameSite: "none" to work
+  secure: true, 
+  // "none" allows the cookie to be sent across different Render subdomains
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", 
+};
    res.cookie("token", newAccessToken, { ...cookieOptions, maxAge: 15 * 60 * 1000 });
 
     res.status(200).json({ message: "Token refreshed" });
@@ -150,11 +152,13 @@ const userData = {
 
        
 
-      const cookieOptions = {
-         httpOnly: true,
-       secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
-  };
+     const cookieOptions = {
+  httpOnly: true,
+  // MUST be true for sameSite: "none" to work
+  secure: true, 
+  // "none" allows the cookie to be sent across different Render subdomains
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", 
+};
       // ✅ Set cookie
    res.cookie("token" ,accessToken, { ...cookieOptions, maxAge: 15 * 60 * 1000 });
    res.cookie("refreshToken", refre_shToken, { ...cookieOptions, maxAge: 7 * 24 * 60 * 60 * 1000 });
