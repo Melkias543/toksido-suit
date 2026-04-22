@@ -38,7 +38,10 @@ const {login}= useAuth()
 
          login(respone.user)
         if (respone.user.role == "admin") {
+
+          setTimeout(() => {
           router.push("/admin/dashboard");
+    }, 100);
         }else{
           router.push("/products");
 
