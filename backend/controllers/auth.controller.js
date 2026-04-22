@@ -52,19 +52,19 @@ GenerateRefreshToken:async(req, res)=>{
 
       // ✅ 1. Generate token using your existing util
       // We assume user.role_id is populated in the Passport Strategy (see step 3)
-      const accessToken = await generateToken(user._id, user.role_id.name);
-      const refre_shToken = await refreshToken(user._id, user.role_id.name);
-      const cookieOptions = {
-         httpOnly: true,
-       secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
-  };
-      // ✅ Set cookie
-              res.cookie("token", accessToken, { ...cookieOptions, maxAge: 15 * 60 * 1000 });
-              res.cookie("refreshToken", refre_shToken, { ...cookieOptions, maxAge: 7 * 24 * 60 * 60 * 1000 });
+  //     const accessToken = await generateToken(user._id, user.role_id.name);
+  //     const refre_shToken = await refreshToken(user._id, user.role_id.name);
+  //     const cookieOptions = {
+  //        httpOnly: true,
+  //      secure: process.env.NODE_ENV === "production",
+  //   sameSite: "strict",
+  // };
+  //     // ✅ Set cookie
+  //             res.cookie("token", accessToken, { ...cookieOptions, maxAge: 15 * 60 * 1000 });
+  //             res.cookie("refreshToken", refre_shToken, { ...cookieOptions, maxAge: 7 * 24 * 60 * 60 * 1000 });
 
-      // ✅ 2. Set cookie using your existing options
-      res.cookie("token", token, cookieOptions);
+  //     // ✅ 2. Set cookie using your existing options
+  //     res.cookie("token", token, cookieOptions);
 
       // ✅ 3. Redirect back to Frontend (Since this is a GET request from a browser redirect)
       // You cannot send a JSON response here because the browser is in a redirect flow.
