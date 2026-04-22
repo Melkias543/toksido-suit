@@ -23,7 +23,7 @@ useEffect(() => {
   // 1. Client-side check: ONLY bounce if we are 100% sure there is no user
   // If there IS a user, we wait for the server to verify the role
   if (!isLoggedIn) {
-    router.replace("/auth/login");
+    // router.replace("/auth/login");
     return;
   }
 
@@ -35,7 +35,7 @@ useEffect(() => {
       }
     } catch (err) {
       console.error("Admin verification failed:", err);
-      router.replace("/auth/login"); // Only redirect if the SERVER says no
+      // router.replace("/auth/login"); // Only redirect if the SERVER says no
     }
   };
 
