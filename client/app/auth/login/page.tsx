@@ -198,7 +198,7 @@ const {login}= useAuth()
               </span>
 
               <Link
-                href="http://localhost:8000/api/auth/google"
+                href="https://toksido-suit-1.onrender.com/api/auth/google"
                 className="flex items-center gap-3 px-6 py-3 border border-[#e5e7eb] hover:bg-[#fcfaf7] transition-colors duration-300 cursor-pointer"
               >
                 {/* Simple SVG Google Icon */}
